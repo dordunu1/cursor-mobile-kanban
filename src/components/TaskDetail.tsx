@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ColumnId, Priority, Task } from '../types'
 import { COLUMNS } from '../types'
+import { IconClose, IconComment } from './Icons'
 
 export function TaskDetail({
   task,
@@ -64,8 +65,8 @@ export function TaskDetail({
             </h2>
             <p className="sheet-sub">Edit fields, move status, or leave a note.</p>
           </div>
-          <button className="icon-btn" onClick={onClose} aria-label="Close">
-            ✕
+          <button className="icon-btn neu-btn" onClick={onClose} aria-label="Close">
+            <IconClose size={18} />
           </button>
         </header>
 
@@ -139,7 +140,9 @@ export function TaskDetail({
         </div>
 
         <section className="comments">
-          <h3>Comments</h3>
+          <h3>
+            <IconComment size={18} /> Comments
+          </h3>
           <div className="comment-list">
             {task.comments.length === 0 ? (
               <p className="sheet-sub">No comments yet.</p>

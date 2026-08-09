@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ColumnId, Priority } from '../types'
 import { COLUMNS } from '../types'
+import { IconClose, IconPlus } from './Icons'
 
 export function NewTaskModal({
   onClose,
@@ -62,8 +63,8 @@ export function NewTaskModal({
             </h2>
             <p className="sheet-sub">Starts in Planning unless you choose another lane.</p>
           </div>
-          <button className="icon-btn" onClick={onClose} aria-label="Close">
-            ✕
+          <button className="icon-btn neu-btn" onClick={onClose} aria-label="Close">
+            <IconClose size={18} />
           </button>
         </header>
 
@@ -142,6 +143,7 @@ export function NewTaskModal({
             Cancel
           </button>
           <button className="btn btn-primary" onClick={submit} disabled={!title.trim()}>
+            <IconPlus size={18} />
             Add task
           </button>
         </div>

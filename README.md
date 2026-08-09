@@ -1,20 +1,18 @@
 # Orbit Board
 
-A local-first Kanban task manager with an Apple-inspired interface and orange accents.
+A local-first Kanban with a premium soft-neumorphic interface, refined ember accents, and branded iconography.
 
 ## Live site
 
 **https://dordunu1.github.io/cursor-mobile-kanban/**
 
-(Hosted with GitHub Pages. First deploy can take 1–2 minutes after merge to `main`.)
-
 ## Features
 
-- Columns: **Planning → In Progress → Completed**
-- Drag and drop tasks between columns
-- Task details: description, priority, tags, due date
-- Comments on each task
-- Light and dark themes
+- Soft neumorphic light & dark themes
+- Workspace pulse overview with completion ring
+- Columns: **Planning → In Progress → Completed** with large status icons
+- Drag and drop between lanes
+- Task details: description, priority, tags, due date, comments
 - Persists in browser `localStorage`
 - Export / import JSON to move boards between browsers
 

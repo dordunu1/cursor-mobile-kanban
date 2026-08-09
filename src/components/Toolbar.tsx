@@ -1,4 +1,12 @@
 import { useRef } from 'react'
+import {
+  IconExport,
+  IconImport,
+  IconMoon,
+  IconOrbit,
+  IconPlus,
+  IconSun,
+} from './Icons'
 
 export function Toolbar({
   theme,
@@ -21,33 +29,34 @@ export function Toolbar({
     <header className="toolbar">
       <div className="brand">
         <div className="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="7" stroke="currentColor" strokeWidth="2.2" />
-            <circle cx="12" cy="12" r="2.4" fill="currentColor" />
-            <path
-              d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <IconOrbit size={28} />
         </div>
         <div className="brand-copy">
           <div className="brand-name">Orbit Board</div>
-          <div className="brand-sub">Personal Kanban · stored on this device</div>
+          <div className="brand-sub">Premium local Kanban · {taskCount} tasks</div>
         </div>
       </div>
 
       <div className="toolbar-actions">
-        <span className="stats-hint">{taskCount} tasks cached locally</span>
-        <button className="btn btn-ghost" onClick={onToggleTheme} aria-label="Toggle theme">
-          {theme === 'dark' ? 'Light' : 'Dark'}
+        <button
+          className="icon-btn neu-btn"
+          onClick={onToggleTheme}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          title="Toggle theme"
+        >
+          {theme === 'dark' ? <IconSun size={20} /> : <IconMoon size={20} />}
         </button>
-        <button className="btn" onClick={onExport}>
-          Export
+        <button className="btn neu-btn" onClick={onExport} title="Export JSON">
+          <IconExport size={18} />
+          <span className="btn-label">Export</span>
         </button>
-        <button className="btn" onClick={() => fileRef.current?.click()}>
-          Import
+        <button
+          className="btn neu-btn"
+          onClick={() => fileRef.current?.click()}
+          title="Import JSON"
+        >
+          <IconImport size={18} />
+          <span className="btn-label">Import</span>
         </button>
         <input
           ref={fileRef}
@@ -61,7 +70,8 @@ export function Toolbar({
           }}
         />
         <button className="btn btn-primary" onClick={onNewTask}>
-          New task
+          <IconPlus size={18} />
+          <span>New task</span>
         </button>
       </div>
     </header>

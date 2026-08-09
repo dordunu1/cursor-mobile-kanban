@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useRef } from 'react'
 import type { Task } from '../types'
+import { IconCalendar, IconComment, IconGrip } from './Icons'
 
 function formatDue(dueDate: string | null): string | null {
   if (!dueDate) return null
@@ -12,9 +13,11 @@ function formatDue(dueDate: string | null): string | null {
 export function TaskCard({
   task,
   onOpen,
+  styleDelay = 0,
 }: {
   task: Task
   onOpen: (task: Task) => void
+  styleDelay?: number
 }) {
   const pointerStart = useRef<{ x: number; y: number } | null>(null)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
@@ -26,6 +29,7 @@ export function TaskCard({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    animationDelay: `${styleDelay}ms`,
   }
 
   const due = formatDue(task.dueDate)
@@ -62,18 +66,33 @@ export function TaskCard({
       tabIndex={0}
       aria-label={`Open task ${task.title}`}
     >
+      <div className="task-card-top">
+        <span className={`priority-gem priority-${task.priority}`} title={task.priority}>
+          {task.priority}
+        </span>
+        <span className="task-grip" aria-hidden="true">
+          <IconGrip size={16} />
+        </span>
+      </div>
       <h3 className="task-card-title">{task.title}</h3>
       {task.description ? <p className="task-card-desc">{task.description}</p> : null}
       <div className="task-meta">
-        <span className={`chip chip-priority-${task.priority}`}>{task.priority}</span>
-        {due ? <span className="chip">Due {due}</span> : null}
+        {due ? (
+          <span className="chip">
+            <IconCalendar size={14} />
+            {due}
+          </span>
+        ) : null}
         {task.tags.slice(0, 2).map((tag) => (
           <span key={tag} className="chip">
             {tag}
           </span>
         ))}
         {task.comments.length > 0 ? (
-          <span className="chip chip-comment">{task.comments.length} notes</span>
+          <span className="chip chip-comment">
+            <IconComment size={14} />
+            {task.comments.length}
+          </span>
         ) : null}
       </div>
     </article>
@@ -83,6 +102,7 @@ export function TaskCard({
 export function TaskCardPreview({ task }: { task: Task }) {
   return (
     <div className="drag-preview">
+      <span className={`priority-gem priority-${task.priority}`}>{task.priority}</span>
       <h3 className="task-card-title">{task.title}</h3>
       {task.description ? <p className="task-card-desc">{task.description}</p> : null}
     </div>
