@@ -2,6 +2,12 @@
 
 A local-first Kanban task manager with an Apple-inspired interface and orange accents.
 
+## Live site
+
+**https://dordunu1.github.io/cursor-mobile-kanban/**
+
+(Hosted with GitHub Pages. First deploy can take 1–2 minutes after merge to `main`.)
+
 ## Features
 
 - Columns: **Planning → In Progress → Completed**
