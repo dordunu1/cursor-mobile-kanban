@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Board } from './components/Board'
+import { BoardPulse } from './components/BoardPulse'
 import { NewTaskModal } from './components/NewTaskModal'
 import { TaskDetail } from './components/TaskDetail'
 import { Toolbar } from './components/Toolbar'
@@ -39,6 +40,8 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      <div className="ambient ambient-a" aria-hidden="true" />
+      <div className="ambient ambient-b" aria-hidden="true" />
       <div className="app-frame">
         <Toolbar
           theme={board.theme}
@@ -58,6 +61,8 @@ export default function App() {
             }
           }}
         />
+
+        <BoardPulse tasksByColumn={tasksByColumn} />
 
         <Board
           tasksByColumn={tasksByColumn}
