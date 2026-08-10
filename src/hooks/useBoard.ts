@@ -291,6 +291,45 @@ export function useBoard() {
     })
   }, [])
 
+  const addDailyGoal = useCallback((title: string) => {
+    const text = title.trim()
+    if (!text) return
+    setBoard((prev) => {
+      const goals = [...(prev.dailyGoals || [])]
+      goals.push({
+        id: crypto.randomUUID(),
+        title: text,
+        order: goals.length,
+        createdAt: new Date().toISOString(),
+      })
+      return { ...prev, dailyGoals: goals }
+    })
+  }, [])
+
+  const deleteDailyGoal = useCallback((goalId: string) => {
+    setBoard((prev) => {
+      const goals = (prev.dailyGoals || [])
+        .filter((g) => g.id !== goalId)
+        .map((goal, index) => ({ ...goal, order: index }))
+      const completions: Record<string, string[]> = {}
+      for (const [date, ids] of Object.entries(prev.dailyCompletions || {})) {
+        completions[date] = ids.filter((id) => id !== goalId)
+      }
+      return { ...prev, dailyGoals: goals, dailyCompletions: completions }
+    })
+  }, [])
+
+  const toggleDailyGoal = useCallback((goalId: string, dateKey: string) => {
+    setBoard((prev) => {
+      const completions = { ...(prev.dailyCompletions || {}) }
+      const todayIds = new Set(completions[dateKey] || [])
+      if (todayIds.has(goalId)) todayIds.delete(goalId)
+      else todayIds.add(goalId)
+      completions[dateKey] = [...todayIds]
+      return { ...prev, dailyCompletions: completions }
+    })
+  }, [])
+
   const exportData = useCallback(() => {
     const stamp = new Date().toISOString().slice(0, 10)
     downloadJson(`orbit-board-${stamp}.json`, exportBoard(board))
@@ -321,6 +360,9 @@ export function useBoard() {
     deleteSubtask,
     clearColumn,
     sortColumn,
+    addDailyGoal,
+    deleteDailyGoal,
+    toggleDailyGoal,
     exportData,
     importData,
   }

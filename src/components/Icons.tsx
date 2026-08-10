@@ -352,3 +352,13 @@ export function IconMore({ size = 24, className }: IconProps) {
     </Svg>
   )
 }
+
+export function IconTarget({ size = 24, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <circle cx="12" cy="12" r="8.2" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="12" cy="12" r="4.6" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="12" cy="12" r="1.6" fill="currentColor" />
+    </Svg>
+  )
+}

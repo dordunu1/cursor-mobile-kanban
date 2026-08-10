@@ -117,5 +117,26 @@ export function createSeedBoard(): BoardState {
     name: 'Orbit Board',
     tasks,
     theme: 'dark',
+    dailyGoals: [
+      {
+        id: crypto.randomUUID(),
+        title: 'Move for 20 minutes',
+        order: 0,
+        createdAt: now,
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Deep work block (no phone)',
+        order: 1,
+        createdAt: now,
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Clear inbox to zero',
+        order: 2,
+        createdAt: now,
+      },
+    ],
+    dailyCompletions: {},
   }
 }

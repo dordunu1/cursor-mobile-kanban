@@ -33,11 +33,21 @@ export interface Task {
   order: number
 }
 
+export interface DailyGoal {
+  id: string
+  title: string
+  order: number
+  createdAt: string
+}
+
 export interface BoardState {
   version: 1
   name: string
   tasks: Task[]
   theme: 'light' | 'dark'
+  dailyGoals: DailyGoal[]
+  /** Map of YYYY-MM-DD -> completed goal ids for that day */
+  dailyCompletions: Record<string, string[]>
   exportedAt?: string
 }
 
@@ -60,4 +70,11 @@ export const PRIORITY_RANK: Record<Priority, number> = {
   high: 0,
   medium: 1,
   low: 2,
+}
+
+export function todayKey(date = new Date()): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }

@@ -1279,6 +1279,201 @@ button:disabled {
   }
 }
 
+.daily-goals {
+  padding: 16px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-out);
+  animation: rise-in 700ms cubic-bezier(0.22, 1, 0.36, 1) 70ms both;
+  display: grid;
+  gap: 14px;
+}
+
+.daily-goals-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.daily-goals-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.daily-goals-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: var(--accent-strong);
+  background: var(--surface);
+  box-shadow: var(--shadow-out-soft);
+  flex-shrink: 0;
+}
+
+.daily-goals-kicker {
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.daily-goals-title {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.4vw, 1.55rem);
+  letter-spacing: -0.03em;
+}
+
+.daily-goals-sub {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.daily-goals-ring {
+  width: 84px;
+  height: 84px;
+  position: relative;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-in);
+  display: grid;
+  place-items: center;
+}
+
+.daily-goals-ring svg {
+  width: 76px;
+  height: 76px;
+  transform: rotate(-90deg);
+}
+
+.daily-goals-ring .ring-track,
+.daily-goals-ring .ring-value {
+  fill: none;
+  stroke-width: 7;
+}
+
+.daily-goals-ring-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 1px;
+}
+
+.daily-goals-ring-label strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.daily-goals-ring-label span {
+  color: var(--text-tertiary);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.daily-goals-list {
+  display: grid;
+  gap: 8px;
+}
+
+.daily-goals-empty {
+  margin: 0;
+  padding: 16px;
+  border-radius: 16px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  box-shadow: var(--shadow-in);
+}
+
+.daily-goal-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 12px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow-in);
+}
+
+.daily-goal-row.is-done .daily-goal-name {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.daily-goal-row.is-done .check-toggle {
+  background: linear-gradient(160deg, var(--accent-strong), var(--accent-deep));
+  color: var(--accent-ink);
+}
+
+.daily-goal-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.daily-goal-name {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.daily-goal-streak {
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.daily-goal-streak.muted {
+  color: var(--text-tertiary);
+}
+
+.daily-goals-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 16px;
+  color: var(--text-secondary);
+  background: var(--surface);
+  box-shadow: var(--shadow-in);
+}
+
+.daily-goals-add input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .daily-goals-header {
+    align-items: flex-start;
+  }
+
+  .daily-goals-ring {
+    width: 72px;
+    height: 72px;
+  }
+
+  .daily-goals-ring svg {
+    width: 64px;
+    height: 64px;
+  }
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;

@@ -14,6 +14,7 @@ A local-first Kanban with a premium soft-neumorphic interface, refined ember acc
 - Quick-add in every column
 - Subtask checklists with card progress
 - Overdue / due-soon styling
+- Daily goals you can check off each day (resets at midnight, tracks streaks)
 - Undo toasts for delete, clear, import, and moves
 - Column actions: sort by due/priority, collapse/clear completed
 - Drag and drop with settle animation and stronger drop glow

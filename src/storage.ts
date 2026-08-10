@@ -1,4 +1,4 @@
-import type { BoardState, Subtask, Task } from './types'
+import type { BoardState, DailyGoal, Subtask, Task } from './types'
 import { STORAGE_KEY } from './types'
 import { createSeedBoard } from './seed'
 
@@ -41,6 +41,68 @@ function normalizeTask(task: Partial<Task>, index: number): Task {
   }
 }
 
+function normalizeDailyGoals(raw: unknown): DailyGoal[] {
+  if (!Array.isArray(raw)) return []
+  return raw.map((item, index) => {
+    const goal = item as Partial<DailyGoal>
+    return {
+      id: goal.id || crypto.randomUUID(),
+      title: String(goal.title || '').trim() || 'Daily goal',
+      order: typeof goal.order === 'number' ? goal.order : index,
+      createdAt: goal.createdAt || new Date().toISOString(),
+    }
+  })
+}
+
+function normalizeCompletions(raw: unknown): Record<string, string[]> {
+  if (!raw || typeof raw !== 'object') return {}
+  const next: Record<string, string[]> = {}
+  for (const [date, ids] of Object.entries(raw as Record<string, unknown>)) {
+    if (Array.isArray(ids)) {
+      next[date] = ids.map(String)
+    }
+  }
+  return next
+}
+
+function defaultDailyGoals(): DailyGoal[] {
+  const now = new Date().toISOString()
+  return [
+    {
+      id: crypto.randomUUID(),
+      title: 'Move for 20 minutes',
+      order: 0,
+      createdAt: now,
+    },
+    {
+      id: crypto.randomUUID(),
+      title: 'Deep work block (no phone)',
+      order: 1,
+      createdAt: now,
+    },
+    {
+      id: crypto.randomUUID(),
+      title: 'Clear inbox to zero',
+      order: 2,
+      createdAt: now,
+    },
+  ]
+}
+
+function normalizeBoard(parsed: BoardState): BoardState {
+  return {
+    version: 1,
+    name: parsed.name || 'Orbit Board',
+    tasks: parsed.tasks.map((task, index) => normalizeTask(task, index)),
+    theme: parsed.theme === 'light' ? 'light' : 'dark',
+    dailyGoals:
+      parsed.dailyGoals === undefined
+        ? defaultDailyGoals()
+        : normalizeDailyGoals(parsed.dailyGoals),
+    dailyCompletions: normalizeCompletions(parsed.dailyCompletions),
+  }
+}
+
 export function loadBoard(): BoardState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
@@ -49,12 +111,7 @@ export function loadBoard(): BoardState {
     if (parsed.version !== 1 || !Array.isArray(parsed.tasks)) {
       return createSeedBoard()
     }
-    return {
-      version: 1,
-      name: parsed.name || 'Orbit Board',
-      tasks: parsed.tasks.map((task, index) => normalizeTask(task, index)),
-      theme: parsed.theme === 'light' ? 'light' : 'dark',
-    }
+    return normalizeBoard(parsed)
   } catch {
     return createSeedBoard()
   }
@@ -66,6 +123,8 @@ export function saveBoard(state: BoardState): void {
     name: state.name,
     tasks: state.tasks,
     theme: state.theme,
+    dailyGoals: state.dailyGoals,
+    dailyCompletions: state.dailyCompletions,
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
 }
@@ -84,12 +143,7 @@ export function parseImport(json: string): BoardState {
   if (parsed.version !== 1 || !Array.isArray(parsed.tasks)) {
     throw new Error('Invalid Orbit Board file')
   }
-  return {
-    version: 1,
-    name: parsed.name || 'Orbit Board',
-    tasks: parsed.tasks.map((task, index) => normalizeTask(task, index)),
-    theme: parsed.theme === 'light' ? 'light' : 'dark',
-  }
+  return normalizeBoard(parsed)
 }
 
 export function downloadJson(filename: string, contents: string): void {

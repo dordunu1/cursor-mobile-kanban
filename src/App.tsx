@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Board } from './components/Board'
 import { BoardPulse } from './components/BoardPulse'
+import { DailyGoals } from './components/DailyGoals'
 import { FilterBar } from './components/FilterBar'
 import { NewTaskModal } from './components/NewTaskModal'
 import { TaskDetail } from './components/TaskDetail'
@@ -8,7 +9,7 @@ import { Toolbar } from './components/Toolbar'
 import { matchesDueFilter } from './due'
 import { useBoard } from './hooks/useBoard'
 import type { BoardFilters, BoardState, ColumnId, Task } from './types'
-import { COLUMNS } from './types'
+import { COLUMNS, todayKey } from './types'
 
 type UndoState = {
   message: string
@@ -41,6 +42,9 @@ export default function App() {
     deleteSubtask,
     clearColumn,
     sortColumn,
+    addDailyGoal,
+    deleteDailyGoal,
+    toggleDailyGoal,
     exportData,
     importData,
   } = useBoard()
@@ -135,6 +139,21 @@ export default function App() {
         />
 
         <BoardPulse tasksByColumn={tasksByColumn} />
+
+        <DailyGoals
+          goals={board.dailyGoals || []}
+          completions={board.dailyCompletions || {}}
+          onAdd={(title) => {
+            addDailyGoal(title)
+            flash('Daily goal added')
+          }}
+          onToggle={(goalId) => toggleDailyGoal(goalId, todayKey())}
+          onDelete={(goalId) => {
+            const previous = snapshot()
+            deleteDailyGoal(goalId)
+            offerUndo('Daily goal removed', previous)
+          }}
+        />
 
         <FilterBar filters={filters} tags={allTags} onChange={setFilters} />
 
