@@ -1279,6 +1279,29 @@ button:disabled {
   }
 }
 
+.workspace-rail {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 980px) {
+  .workspace-rail {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    align-items: stretch;
+    gap: 18px;
+  }
+
+  .workspace-rail .board-pulse {
+    min-width: 0;
+  }
+
+  .workspace-rail .daily-goals {
+    width: 100%;
+    max-width: 380px;
+    justify-self: end;
+  }
+}
+
 .daily-goals {
   padding: 16px;
   border-radius: var(--radius-xl);
@@ -1286,14 +1309,15 @@ button:disabled {
   box-shadow: var(--shadow-out);
   animation: rise-in 700ms cubic-bezier(0.22, 1, 0.36, 1) 70ms both;
   display: grid;
-  gap: 14px;
+  gap: 12px;
+  align-content: start;
 }
 
 .daily-goals-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
 }
 
 .daily-goals-brand {
@@ -1304,9 +1328,9 @@ button:disabled {
 }
 
 .daily-goals-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 18px;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
   display: grid;
   place-items: center;
   color: var(--accent-strong);
@@ -1317,7 +1341,7 @@ button:disabled {
 
 .daily-goals-kicker {
   color: var(--accent-strong);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -1326,30 +1350,31 @@ button:disabled {
 .daily-goals-title {
   margin: 2px 0 0;
   font-family: var(--font-display);
-  font-size: clamp(1.2rem, 2.4vw, 1.55rem);
+  font-size: 1.25rem;
   letter-spacing: -0.03em;
 }
 
 .daily-goals-sub {
   margin: 4px 0 0;
   color: var(--text-secondary);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
 }
 
 .daily-goals-ring {
-  width: 84px;
-  height: 84px;
+  width: 72px;
+  height: 72px;
   position: relative;
   border-radius: 50%;
   background: var(--surface);
   box-shadow: var(--shadow-in);
   display: grid;
   place-items: center;
+  flex-shrink: 0;
 }
 
 .daily-goals-ring svg {
-  width: 76px;
-  height: 76px;
+  width: 64px;
+  height: 64px;
   transform: rotate(-90deg);
 }
 
@@ -1370,13 +1395,13 @@ button:disabled {
 
 .daily-goals-ring-label strong {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.92rem;
   letter-spacing: -0.02em;
 }
 
 .daily-goals-ring-label span {
   color: var(--text-tertiary);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -1388,10 +1413,10 @@ button:disabled {
 
 .daily-goals-empty {
   margin: 0;
-  padding: 16px;
+  padding: 14px;
   border-radius: 16px;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   line-height: 1.45;
   box-shadow: var(--shadow-in);
 }
@@ -1426,11 +1451,12 @@ button:disabled {
 .daily-goal-name {
   font-weight: 600;
   letter-spacing: -0.01em;
+  font-size: 0.92rem;
 }
 
 .daily-goal-streak {
   color: var(--accent-strong);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 650;
 }
 
@@ -1438,39 +1464,57 @@ button:disabled {
   color: var(--text-tertiary);
 }
 
-.daily-goals-add {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 16px;
-  color: var(--text-secondary);
-  background: var(--surface);
-  box-shadow: var(--shadow-in);
+.daily-goals-add-btn {
+  width: fit-content;
+  justify-self: start;
 }
 
-.daily-goals-add input {
-  flex: 1;
-  min-width: 0;
+.daily-goals-composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.daily-goals-composer input {
+  min-height: 42px;
   border: none;
-  background: transparent;
-  outline: none;
+  border-radius: 14px;
+  padding: 0 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-in);
   color: var(--text);
+  outline: none;
+}
+
+.daily-goals-composer .btn-primary {
+  min-height: 42px;
+  padding: 0 14px;
+}
+
+@media (max-width: 979px) {
+  .daily-goals {
+    max-width: 420px;
+  }
 }
 
 @media (max-width: 640px) {
+  .daily-goals {
+    max-width: none;
+  }
+
   .daily-goals-header {
     align-items: flex-start;
   }
 
   .daily-goals-ring {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
   }
 
   .daily-goals-ring svg {
-    width: 64px;
-    height: 64px;
+    width: 58px;
+    height: 58px;
   }
 }
 

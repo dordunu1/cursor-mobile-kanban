@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { DailyGoal } from '../types'
 import { todayKey } from '../types'
-import { IconCheck, IconPlus, IconTarget, IconTrash } from './Icons'
+import { IconCheck, IconClose, IconPlus, IconTarget, IconTrash } from './Icons'
 
 function countStreak(
   goalId: string,
@@ -14,7 +14,6 @@ function countStreak(
     const done = (completions[key] || []).includes(goalId)
     if (!done) {
       if (i === 0) {
-        // today not done yet — keep looking at yesterday for current streak
         cursor.setDate(cursor.getDate() - 1)
         continue
       }
@@ -40,6 +39,8 @@ export function DailyGoals({
   onDelete: (goalId: string) => void
 }) {
   const [draft, setDraft] = useState('')
+  const [adding, setAdding] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
   const date = todayKey()
   const doneToday = useMemo(() => new Set(completions[date] || []), [completions, date])
   const sorted = useMemo(
@@ -50,22 +51,34 @@ export function DailyGoals({
   const total = sorted.length
   const pct = total ? Math.round((doneCount / total) * 100) : 0
   const label = new Date().toLocaleDateString(undefined, {
-    weekday: 'long',
+    weekday: 'short',
     month: 'short',
     day: 'numeric',
   })
+
+  useEffect(() => {
+    if (adding) inputRef.current?.focus()
+  }, [adding])
+
+  const submit = () => {
+    const value = draft.trim()
+    if (!value) return
+    onAdd(value)
+    setDraft('')
+    setAdding(false)
+  }
 
   return (
     <section className="daily-goals" aria-label="Daily goals">
       <header className="daily-goals-header">
         <div className="daily-goals-brand">
           <div className="daily-goals-icon" aria-hidden="true">
-            <IconTarget size={26} />
+            <IconTarget size={22} />
           </div>
           <div>
             <div className="daily-goals-kicker">Daily goals</div>
-            <h2 className="daily-goals-title">Repeat every day</h2>
-            <p className="daily-goals-sub">{label} · resets at midnight</p>
+            <h2 className="daily-goals-title">Today’s habits</h2>
+            <p className="daily-goals-sub">{label} · resets nightly</p>
           </div>
         </div>
         <div className="daily-goals-meter" aria-hidden="true">
@@ -93,7 +106,7 @@ export function DailyGoals({
       <div className="daily-goals-list">
         {sorted.length === 0 ? (
           <p className="daily-goals-empty">
-            Add habits you want to complete every day — they uncheck tomorrow.
+            Keep a short list of habits. Check them off each day — they reset tomorrow.
           </p>
         ) : (
           sorted.map((goal) => {
@@ -113,7 +126,7 @@ export function DailyGoals({
                   {streak > 0 ? (
                     <span className="daily-goal-streak">{streak}-day streak</span>
                   ) : (
-                    <span className="daily-goal-streak muted">Start a streak</span>
+                    <span className="daily-goal-streak muted">No streak yet</span>
                   )}
                 </div>
                 <button
@@ -129,25 +142,48 @@ export function DailyGoals({
         )}
       </div>
 
-      <form
-        className="daily-goals-add"
-        onSubmit={(event) => {
-          event.preventDefault()
-          onAdd(draft)
-          setDraft('')
-        }}
-      >
-        <IconPlus size={16} />
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          placeholder="Add a daily goal…"
-          aria-label="Add a daily goal"
-        />
-        <button type="submit" className="quick-add-btn" disabled={!draft.trim()}>
-          Add
+      {adding ? (
+        <form
+          className="daily-goals-composer"
+          onSubmit={(event) => {
+            event.preventDefault()
+            submit()
+          }}
+        >
+          <input
+            ref={inputRef}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="e.g. Read 20 pages"
+            aria-label="New daily goal title"
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                setAdding(false)
+                setDraft('')
+              }
+            }}
+          />
+          <button type="submit" className="btn btn-primary" disabled={!draft.trim()}>
+            Save
+          </button>
+          <button
+            type="button"
+            className="icon-btn neu-btn"
+            aria-label="Cancel"
+            onClick={() => {
+              setAdding(false)
+              setDraft('')
+            }}
+          >
+            <IconClose size={16} />
+          </button>
+        </form>
+      ) : (
+        <button className="btn neu-btn daily-goals-add-btn" onClick={() => setAdding(true)}>
+          <IconPlus size={18} />
+          Add goal
         </button>
-      </form>
+      )}
     </section>
   )
 }

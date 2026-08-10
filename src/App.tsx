@@ -138,22 +138,24 @@ export default function App() {
           }}
         />
 
-        <BoardPulse tasksByColumn={tasksByColumn} />
+        <div className="workspace-rail">
+          <BoardPulse tasksByColumn={tasksByColumn} />
 
-        <DailyGoals
-          goals={board.dailyGoals || []}
-          completions={board.dailyCompletions || {}}
-          onAdd={(title) => {
-            addDailyGoal(title)
-            flash('Daily goal added')
-          }}
-          onToggle={(goalId) => toggleDailyGoal(goalId, todayKey())}
-          onDelete={(goalId) => {
-            const previous = snapshot()
-            deleteDailyGoal(goalId)
-            offerUndo('Daily goal removed', previous)
-          }}
-        />
+          <DailyGoals
+            goals={board.dailyGoals || []}
+            completions={board.dailyCompletions || {}}
+            onAdd={(title) => {
+              addDailyGoal(title)
+              flash('Daily goal added')
+            }}
+            onToggle={(goalId) => toggleDailyGoal(goalId, todayKey())}
+            onDelete={(goalId) => {
+              const previous = snapshot()
+              deleteDailyGoal(goalId)
+              offerUndo('Daily goal removed', previous)
+            }}
+          />
+        </div>
 
         <FilterBar filters={filters} tags={allTags} onChange={setFilters} />
 
