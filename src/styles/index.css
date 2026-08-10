@@ -636,8 +636,7 @@ button:disabled {
   text-align: left;
   border-radius: var(--radius-md);
   background: var(--surface-solid);
-  padding: 0;
-  overflow: hidden;
+  padding: 14px 14px 12px;
   box-shadow: var(--shadow-out-soft);
   cursor: grab;
   transition: transform 160ms ease, box-shadow 160ms ease;
@@ -646,27 +645,7 @@ button:disabled {
 }
 
 .task-card-body {
-  padding: 14px 14px 12px 16px;
-}
-
-.priority-rail {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-}
-
-.priority-rail.priority-high {
-  background: linear-gradient(180deg, var(--accent-strong), var(--accent-deep));
-}
-
-.priority-rail.priority-medium {
-  background: linear-gradient(180deg, #8bbbff, var(--info));
-}
-
-.priority-rail.priority-low {
-  background: linear-gradient(180deg, #79d8ae, var(--success));
+  padding: 0;
 }
 
 .task-card.due-soon {
@@ -997,15 +976,14 @@ button:disabled {
   position: relative;
   border-radius: var(--radius-md);
   background: var(--surface-solid);
-  padding: 0;
+  padding: 14px;
   width: 280px;
   box-shadow: var(--shadow-float);
   cursor: grabbing;
-  overflow: hidden;
 }
 
 .drag-preview .task-card-body {
-  padding: 14px 14px 12px 16px;
+  padding: 0;
 }
 
 .filter-bar {

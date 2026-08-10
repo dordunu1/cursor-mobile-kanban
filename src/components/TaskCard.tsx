@@ -67,7 +67,6 @@ export function TaskCard({
       tabIndex={0}
       aria-label={`Open task ${task.title}`}
     >
-      <span className={`priority-rail priority-${task.priority}`} aria-hidden="true" />
       <div className="task-card-body">
         <div className="task-card-top">
           <span className={`priority-gem priority-${task.priority}`} title={task.priority}>
@@ -118,7 +117,6 @@ export function TaskCard({
 export function TaskCardPreview({ task }: { task: Task }) {
   return (
     <div className="drag-preview">
-      <span className={`priority-rail priority-${task.priority}`} aria-hidden="true" />
       <div className="task-card-body">
         <span className={`priority-gem priority-${task.priority}`}>{task.priority}</span>
         <h3 className="task-card-title">{task.title}</h3>
