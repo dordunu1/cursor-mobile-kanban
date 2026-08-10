@@ -10,9 +10,13 @@ A local-first Kanban with a premium soft-neumorphic interface, refined ember acc
 
 - Soft neumorphic light & dark themes
 - Workspace pulse overview with completion ring
-- Columns: **Planning → In Progress → Completed** with large status icons
-- Drag and drop between lanes
-- Task details: description, priority, tags, due date, comments
+- Search + filters (priority, due, tags)
+- Quick-add in every column
+- Subtask checklists with card progress
+- Overdue / due-soon styling
+- Undo toasts for delete, clear, import, and moves
+- Column actions: sort by due/priority, collapse/clear completed
+- Drag and drop with settle animation and stronger drop glow
 - Persists in browser `localStorage`
 - Export / import JSON to move boards between browsers
 

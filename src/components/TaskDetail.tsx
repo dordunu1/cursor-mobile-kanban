@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ColumnId, Priority, Task } from '../types'
 import { COLUMNS } from '../types'
-import { IconClose, IconComment } from './Icons'
+import { IconCheck, IconClose, IconComment, IconPlus, IconTrash } from './Icons'
 
 export function TaskDetail({
   task,
@@ -10,6 +10,9 @@ export function TaskDetail({
   onDelete,
   onAddComment,
   onDeleteComment,
+  onAddSubtask,
+  onToggleSubtask,
+  onDeleteSubtask,
 }: {
   task: Task
   onClose: () => void
@@ -17,6 +20,9 @@ export function TaskDetail({
   onDelete: () => void
   onAddComment: (body: string) => void
   onDeleteComment: (commentId: string) => void
+  onAddSubtask: (title: string) => void
+  onToggleSubtask: (subtaskId: string) => void
+  onDeleteSubtask: (subtaskId: string) => void
 }) {
   const [title, setTitle] = useState(task.title)
   const [description, setDescription] = useState(task.description)
@@ -25,6 +31,7 @@ export function TaskDetail({
   const [tags, setTags] = useState(task.tags.join(', '))
   const [dueDate, setDueDate] = useState(task.dueDate ?? '')
   const [comment, setComment] = useState('')
+  const [subtaskDraft, setSubtaskDraft] = useState('')
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -49,6 +56,8 @@ export function TaskDetail({
     onClose()
   }
 
+  const doneCount = task.subtasks.filter((s) => s.done).length
+
   return (
     <div className="overlay" onClick={onClose} role="presentation">
       <div
@@ -63,7 +72,7 @@ export function TaskDetail({
             <h2 id="task-detail-title" className="sheet-title">
               Task details
             </h2>
-            <p className="sheet-sub">Edit fields, move status, or leave a note.</p>
+            <p className="sheet-sub">Edit fields, checklist, status, or leave a note.</p>
           </div>
           <button className="icon-btn neu-btn" onClick={onClose} aria-label="Close">
             <IconClose size={18} />
@@ -138,6 +147,60 @@ export function TaskDetail({
             </div>
           </div>
         </div>
+
+        <section className="checklist">
+          <div className="checklist-head">
+            <h3>
+              <IconCheck size={18} /> Checklist
+            </h3>
+            <span>
+              {doneCount}/{task.subtasks.length}
+            </span>
+          </div>
+          <div className="checklist-list">
+            {task.subtasks.length === 0 ? (
+              <p className="sheet-sub">Break this task into smaller steps.</p>
+            ) : (
+              task.subtasks.map((item) => (
+                <div key={item.id} className={`checklist-item${item.done ? ' is-done' : ''}`}>
+                  <button
+                    className="check-toggle"
+                    onClick={() => onToggleSubtask(item.id)}
+                    aria-label={item.done ? 'Mark incomplete' : 'Mark complete'}
+                  >
+                    {item.done ? <IconCheck size={14} /> : null}
+                  </button>
+                  <span>{item.title}</span>
+                  <button
+                    className="icon-btn neu-btn checklist-delete"
+                    onClick={() => onDeleteSubtask(item.id)}
+                    aria-label="Delete subtask"
+                  >
+                    <IconTrash size={14} />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+          <form
+            className="checklist-add"
+            onSubmit={(event) => {
+              event.preventDefault()
+              onAddSubtask(subtaskDraft)
+              setSubtaskDraft('')
+            }}
+          >
+            <IconPlus size={16} />
+            <input
+              value={subtaskDraft}
+              onChange={(e) => setSubtaskDraft(e.target.value)}
+              placeholder="Add a checklist item…"
+            />
+            <button type="submit" className="btn" disabled={!subtaskDraft.trim()}>
+              Add
+            </button>
+          </form>
+        </section>
 
         <section className="comments">
           <h3>

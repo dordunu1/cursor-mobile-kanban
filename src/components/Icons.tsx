@@ -272,3 +272,83 @@ export function IconSpark({ size = 24, className }: IconProps) {
     </Svg>
   )
 }
+
+export function IconSearch({ size = 24, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <circle cx="11" cy="11" r="6.2" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M16.2 16.2 20 20"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </Svg>
+  )
+}
+
+export function IconSort({ size = 24, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <path
+        d="M8 6v12M8 18l-2.4-2.4M8 18l2.4-2.4M16 18V6M16 6l-2.4 2.4M16 6l2.4 2.4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  )
+}
+
+export function IconChevron({ size = 24, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <path
+        d="M8 10l4 4 4-4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  )
+}
+
+export function IconCheck({ size = 24, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <path
+        d="M6.5 12.2 10 15.7 17.5 8"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  )
+}
+
+export function IconTrash({ size = 24, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <path
+        d="M5.5 8h13M10 8V6.5a1.5 1.5 0 0 1 1.5-1.5h1A1.5 1.5 0 0 1 14 6.5V8M9 10.5v6M12 10.5v6M15 10.5v6M7 8l.7 11a2 2 0 0 0 2 1.8h4.6a2 2 0 0 0 2-1.8L17 8"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  )
+}
+
+export function IconMore({ size = 24, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <circle cx="6.5" cy="12" r="1.3" fill="currentColor" />
+      <circle cx="12" cy="12" r="1.3" fill="currentColor" />
+      <circle cx="17.5" cy="12" r="1.3" fill="currentColor" />
+    </Svg>
+  )
+}
