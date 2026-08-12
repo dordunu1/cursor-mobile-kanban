@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useFocusTrap } from '../hooks/useFocusTrap'
 import type { ColumnId, Priority, Task } from '../types'
 import { COLUMNS } from '../types'
-import { IconCheck, IconClose, IconComment, IconPlus, IconTrash } from './Icons'
+import { IconCheck, IconClose, IconComment, IconCopy, IconPlus, IconTrash } from './Icons'
+import { MarkdownBody } from './MarkdownBody'
 
 export function TaskDetail({
   task,
+  wipBlocked,
   onClose,
   onSave,
+  onMoveColumn,
   onDelete,
+  onDuplicate,
   onAddComment,
   onDeleteComment,
   onAddSubtask,
@@ -15,15 +20,21 @@ export function TaskDetail({
   onDeleteSubtask,
 }: {
   task: Task
+  wipBlocked: boolean
   onClose: () => void
   onSave: (patch: Partial<Task>) => void
+  onMoveColumn: (columnId: ColumnId) => boolean
   onDelete: () => void
+  onDuplicate: () => void
   onAddComment: (body: string) => void
   onDeleteComment: (commentId: string) => void
   onAddSubtask: (title: string) => void
   onToggleSubtask: (subtaskId: string) => void
   onDeleteSubtask: (subtaskId: string) => void
 }) {
+  const sheetRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(sheetRef, true)
+
   const [title, setTitle] = useState(task.title)
   const [description, setDescription] = useState(task.description)
   const [columnId, setColumnId] = useState<ColumnId>(task.columnId)
@@ -34,6 +45,10 @@ export function TaskDetail({
   const [subtaskDraft, setSubtaskDraft] = useState('')
 
   useEffect(() => {
+    setColumnId(task.columnId)
+  }, [task.columnId])
+
+  useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
     }
@@ -42,10 +57,16 @@ export function TaskDetail({
   }, [onClose])
 
   const save = () => {
+    if (columnId !== task.columnId) {
+      const moved = onMoveColumn(columnId)
+      if (!moved) {
+        setColumnId(task.columnId)
+        return
+      }
+    }
     onSave({
       title: title.trim() || 'Untitled task',
       description: description.trim(),
-      columnId,
       priority,
       tags: tags
         .split(',')
@@ -57,10 +78,15 @@ export function TaskDetail({
   }
 
   const doneCount = task.subtasks.filter((s) => s.done).length
+  const statusOptions = [
+    ...COLUMNS,
+    { id: 'archive' as const, title: 'Archive', subtitle: '' },
+  ]
 
   return (
     <div className="overlay" onClick={onClose} role="presentation">
       <div
+        ref={sheetRef}
         className="sheet"
         role="dialog"
         aria-modal="true"
@@ -95,8 +121,14 @@ export function TaskDetail({
               id="task-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add context, links, or acceptance notes"
+              placeholder="Markdown works: **bold**, *italic*, `code`, [links](https://), and - lists"
             />
+            {description.trim() ? (
+              <div className="markdown-preview">
+                <span className="markdown-preview-label">Preview</span>
+                <MarkdownBody className="markdown-body" text={description} />
+              </div>
+            ) : null}
           </div>
           <div className="form-row two">
             <div className="field">
@@ -106,12 +138,15 @@ export function TaskDetail({
                 value={columnId}
                 onChange={(e) => setColumnId(e.target.value as ColumnId)}
               >
-                {COLUMNS.map((column) => (
+                {statusOptions.map((column) => (
                   <option key={column.id} value={column.id}>
                     {column.title}
                   </option>
                 ))}
               </select>
+              {wipBlocked && columnId === 'in_progress' && task.columnId !== 'in_progress' ? (
+                <p className="field-hint">In Progress is at its WIP limit.</p>
+              ) : null}
             </div>
             <div className="field">
               <label htmlFor="task-priority">Priority</label>
@@ -262,6 +297,10 @@ export function TaskDetail({
         <div className="sheet-actions">
           <button className="btn btn-danger" onClick={onDelete}>
             Delete task
+          </button>
+          <button className="btn neu-btn" onClick={onDuplicate}>
+            <IconCopy size={16} />
+            Duplicate
           </button>
           <button className="btn btn-ghost" onClick={onClose}>
             Cancel

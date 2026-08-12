@@ -1,7 +1,7 @@
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useEffect, useRef, useState } from 'react'
-import type { ColumnId, ColumnSort, Task } from '../types'
+import type { BoardColumnId, ColumnSort, Task } from '../types'
 import {
   IconCompleted,
   IconMore,
@@ -24,29 +24,39 @@ export function Column({
   tasks,
   settlingId,
   collapsed,
+  filtered,
+  wipLimit,
+  wipCount,
   onToggleCollapsed,
   onOpenTask,
   onQuickAdd,
   onSort,
   onClear,
+  onSetWipLimit,
 }: {
-  id: ColumnId
+  id: BoardColumnId
   title: string
   subtitle: string
   tasks: Task[]
   settlingId: string | null
   collapsed: boolean
+  filtered: boolean
+  wipLimit: number
+  wipCount: number
   onToggleCollapsed: () => void
   onOpenTask: (task: Task) => void
   onQuickAdd: (title: string) => void
   onSort: (mode: ColumnSort) => void
   onClear: () => void
+  onSetWipLimit: (limit: number) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id })
   const Icon = COLUMN_ICONS[id]
   const [draft, setDraft] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const atWip =
+    id === 'in_progress' && wipLimit > 0 && wipCount >= wipLimit
 
   useEffect(() => {
     if (!menuOpen) return
@@ -66,7 +76,7 @@ export function Column({
 
   return (
     <section
-      className={`column tone-${id}${isOver ? ' is-over' : ''}${collapsed ? ' is-collapsed' : ''}`}
+      className={`column tone-${id}${isOver ? ' is-over' : ''}${collapsed ? ' is-collapsed' : ''}${atWip ? ' is-wip-full' : ''}`}
       aria-label={title}
     >
       <header className="column-header">
@@ -76,11 +86,19 @@ export function Column({
           </div>
           <div>
             <h2 className="column-title">{title}</h2>
-            <p className="column-sub">{subtitle}</p>
+            <p className="column-sub">
+              {id === 'in_progress' && wipLimit > 0
+                ? `WIP ${wipCount}/${wipLimit}`
+                : subtitle}
+            </p>
           </div>
         </div>
         <div className="column-tools">
-          <span className="column-count">{tasks.length}</span>
+          <span className={`column-count${atWip ? ' is-wip' : ''}`}>
+            {id === 'in_progress' && wipLimit > 0
+              ? `${wipCount}/${wipLimit}`
+              : tasks.length}
+          </span>
           <div className="column-menu" ref={menuRef}>
             <button
               className="icon-btn neu-btn column-menu-btn"
@@ -110,6 +128,37 @@ export function Column({
                 >
                   Sort by priority
                 </button>
+                {id === 'in_progress' ? (
+                  <>
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        onSetWipLimit(3)
+                        setMenuOpen(false)
+                      }}
+                    >
+                      WIP limit: 3
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        onSetWipLimit(5)
+                        setMenuOpen(false)
+                      }}
+                    >
+                      WIP limit: 5
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        onSetWipLimit(0)
+                        setMenuOpen(false)
+                      }}
+                    >
+                      WIP unlimited
+                    </button>
+                  </>
+                ) : null}
                 {id === 'completed' ? (
                   <button
                     role="menuitem"
@@ -130,7 +179,7 @@ export function Column({
                       setMenuOpen(false)
                     }}
                   >
-                    Clear completed
+                    Archive completed
                   </button>
                 ) : null}
               </div>
@@ -151,7 +200,11 @@ export function Column({
                   <div className={`empty-glyph tone-${id}`}>
                     <Icon size={36} />
                   </div>
-                  <p>Drop a task into {title.toLowerCase()}</p>
+                  <p>
+                    {filtered
+                      ? 'No matching tasks in this lane'
+                      : `Drop a task into ${title.toLowerCase()}`}
+                  </p>
                 </div>
               ) : (
                 tasks.map((task, index) => (

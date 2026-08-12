@@ -1,29 +1,57 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
+  IconArchive,
   IconExport,
   IconImport,
   IconMoon,
   IconOrbit,
   IconPlus,
+  IconReset,
   IconSun,
 } from './Icons'
 
 export function Toolbar({
+  name,
   theme,
   taskCount,
+  archiveCount,
+  onRename,
   onToggleTheme,
   onNewTask,
   onExport,
   onImport,
+  onOpenArchive,
+  onResetDemo,
 }: {
+  name: string
   theme: 'light' | 'dark'
   taskCount: number
+  archiveCount: number
+  onRename: (name: string) => void
   onToggleTheme: () => void
   onNewTask: () => void
   onExport: () => void
   onImport: (file: File) => void
+  onOpenArchive: () => void
+  onResetDemo: () => void
 }) {
   const fileRef = useRef<HTMLInputElement>(null)
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(name)
+  const nameRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setDraft(name)
+  }, [name])
+
+  useEffect(() => {
+    if (editing) nameRef.current?.focus()
+  }, [editing])
+
+  const commitName = () => {
+    onRename(draft)
+    setEditing(false)
+  }
 
   return (
     <header className="toolbar">
@@ -32,8 +60,36 @@ export function Toolbar({
           <IconOrbit size={28} />
         </div>
         <div className="brand-copy">
-          <div className="brand-name">Orbit Board</div>
-          <div className="brand-sub">Premium local Kanban · {taskCount} tasks</div>
+          {editing ? (
+            <input
+              ref={nameRef}
+              className="brand-name-input"
+              value={draft}
+              aria-label="Board name"
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={commitName}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') commitName()
+                if (event.key === 'Escape') {
+                  setDraft(name)
+                  setEditing(false)
+                }
+              }}
+            />
+          ) : (
+            <button
+              type="button"
+              className="brand-name"
+              onClick={() => setEditing(true)}
+              title="Rename board"
+            >
+              {name}
+            </button>
+          )}
+          <div className="brand-sub">
+            Local Kanban · {taskCount} on board
+            {archiveCount ? ` · ${archiveCount} archived` : ''}
+          </div>
         </div>
       </div>
 
@@ -45,6 +101,22 @@ export function Toolbar({
           title="Toggle theme"
         >
           {theme === 'dark' ? <IconSun size={20} /> : <IconMoon size={20} />}
+        </button>
+        <button
+          className="icon-btn neu-btn"
+          onClick={onOpenArchive}
+          aria-label="Open archive"
+          title="Archive"
+        >
+          <IconArchive size={18} />
+        </button>
+        <button
+          className="icon-btn neu-btn"
+          onClick={onResetDemo}
+          aria-label="Reset demo board"
+          title="Reset demo"
+        >
+          <IconReset size={18} />
         </button>
         <button className="btn neu-btn" onClick={onExport} title="Export JSON">
           <IconExport size={18} />

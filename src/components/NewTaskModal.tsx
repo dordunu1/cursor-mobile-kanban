@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import type { ColumnId, Priority } from '../types'
+import { useEffect, useRef, useState } from 'react'
+import { useFocusTrap } from '../hooks/useFocusTrap'
+import type { BoardColumnId, Priority } from '../types'
 import { COLUMNS } from '../types'
 import { IconClose, IconPlus } from './Icons'
 
@@ -11,15 +12,17 @@ export function NewTaskModal({
   onCreate: (input: {
     title: string
     description: string
-    columnId: ColumnId
+    columnId: BoardColumnId
     priority: Priority
     tags: string[]
     dueDate: string | null
   }) => void
 }) {
+  const sheetRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(sheetRef, true)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [columnId, setColumnId] = useState<ColumnId>('planning')
+  const [columnId, setColumnId] = useState<BoardColumnId>('planning')
   const [priority, setPriority] = useState<Priority>('medium')
   const [tags, setTags] = useState('')
   const [dueDate, setDueDate] = useState('')
@@ -50,6 +53,7 @@ export function NewTaskModal({
   return (
     <div className="overlay" onClick={onClose} role="presentation">
       <div
+        ref={sheetRef}
         className="sheet"
         role="dialog"
         aria-modal="true"
@@ -77,6 +81,9 @@ export function NewTaskModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ship the next milestone"
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && title.trim()) submit()
+              }}
             />
           </div>
           <div className="field">
@@ -85,7 +92,7 @@ export function NewTaskModal({
               id="new-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional details"
+              placeholder="Optional details. Markdown is welcome."
             />
           </div>
           <div className="form-row two">
@@ -94,7 +101,7 @@ export function NewTaskModal({
               <select
                 id="new-column"
                 value={columnId}
-                onChange={(e) => setColumnId(e.target.value as ColumnId)}
+                onChange={(e) => setColumnId(e.target.value as BoardColumnId)}
               >
                 {COLUMNS.map((column) => (
                   <option key={column.id} value={column.id}>

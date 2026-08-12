@@ -1,10 +1,10 @@
-import type { ColumnId, Task } from '../types'
+import type { BoardColumnId, Task } from '../types'
 import { IconCompleted, IconPlanning, IconProgress, IconSpark } from './Icons'
 
 export function BoardPulse({
   tasksByColumn,
 }: {
-  tasksByColumn: Record<ColumnId, Task[]>
+  tasksByColumn: Record<BoardColumnId, Task[]>
 }) {
   const planning = tasksByColumn.planning.length
   const progress = tasksByColumn.in_progress.length
@@ -21,7 +21,7 @@ export function BoardPulse({
         </div>
         <h1 className="pulse-title">Shape the week with calm focus</h1>
         <p className="pulse-sub">
-          Drag cards between lanes. Everything stays on this device until you export.
+          Drag from the grip. Completing a card celebrates. Everything stays on this device until you export.
         </p>
       </div>
 
