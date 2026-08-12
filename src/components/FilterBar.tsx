@@ -1,5 +1,6 @@
 import { IconSearch } from './Icons'
 import type { BoardFilters, DueFilter, PriorityFilter } from '../types'
+import { emptyFilters, filtersAreActive } from '../types'
 
 export function FilterBar({
   filters,
@@ -10,6 +11,8 @@ export function FilterBar({
   tags: string[]
   onChange: (next: BoardFilters) => void
 }) {
+  const active = filtersAreActive(filters)
+
   return (
     <section className="filter-bar" aria-label="Search and filters">
       <label className="filter-search">
@@ -17,7 +20,7 @@ export function FilterBar({
         <input
           value={filters.query}
           onChange={(e) => onChange({ ...filters, query: e.target.value })}
-          placeholder="Search tasks, tags, notes…"
+          placeholder="Search tasks, tags, notes…  (/)"
           aria-label="Search tasks"
         />
       </label>
@@ -46,6 +49,7 @@ export function FilterBar({
           >
             <option value="all">All</option>
             <option value="overdue">Overdue</option>
+            <option value="today">Today</option>
             <option value="soon">Due soon</option>
             <option value="none">No date</option>
           </select>
@@ -65,6 +69,16 @@ export function FilterBar({
             ))}
           </select>
         </label>
+
+        {active ? (
+          <button
+            type="button"
+            className="btn neu-btn filter-clear"
+            onClick={() => onChange(emptyFilters())}
+          >
+            Clear
+          </button>
+        ) : null}
       </div>
     </section>
   )

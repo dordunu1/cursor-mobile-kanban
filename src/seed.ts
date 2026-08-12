@@ -1,4 +1,5 @@
 import type { BoardState, Task } from './types'
+import { DEFAULT_WIP_LIMIT } from './types'
 
 function daysFromNow(days: number): string {
   const d = new Date()
@@ -6,15 +7,20 @@ function daysFromNow(days: number): string {
   return d.toISOString().slice(0, 10)
 }
 
+function hoursAgo(hours: number): string {
+  return new Date(Date.now() - hours * 3600 * 1000).toISOString()
+}
+
 export function createSeedBoard(): BoardState {
   const now = new Date().toISOString()
+  const aged = hoursAgo(24 * 4)
 
   const tasks: Task[] = [
     {
       id: crypto.randomUUID(),
       title: 'Sketch onboarding flow',
       description:
-        'Map the first-run experience so new users land on a board that already feels useful.',
+        'Map the first-run experience so new users land on a board that already feels useful.\n\n- Keep the first viewport calm\n- One headline, one CTA\n- See the **mobile pass** notes',
       columnId: 'planning',
       priority: 'high',
       tags: ['design', 'ux'],
@@ -33,6 +39,8 @@ export function createSeedBoard(): BoardState {
       ],
       createdAt: now,
       updatedAt: now,
+      columnEnteredAt: now,
+      completedAt: null,
       order: 0,
     },
     {
@@ -47,21 +55,23 @@ export function createSeedBoard(): BoardState {
       subtasks: [],
       createdAt: now,
       updatedAt: now,
+      columnEnteredAt: now,
+      completedAt: null,
       order: 1,
     },
     {
       id: crypto.randomUUID(),
       title: 'Wire drag-and-drop columns',
       description:
-        'Planning → In Progress → Completed with smooth reordering inside each lane.',
+        'Planning → In Progress → Completed with smooth reordering inside each lane.\n\nUse the **grip** to drag. Space/arrow keys also move a focused handle.',
       columnId: 'in_progress',
       priority: 'high',
       tags: ['engineering'],
-      dueDate: daysFromNow(1),
+      dueDate: daysFromNow(0),
       comments: [
         {
           id: crypto.randomUUID(),
-          body: 'Using dnd-kit for keyboard-friendly dragging.',
+          body: 'Keyboard sensor + a dedicated grip so cards stay tappable on phones.',
           createdAt: now,
         },
       ],
@@ -69,8 +79,10 @@ export function createSeedBoard(): BoardState {
         { id: crypto.randomUUID(), title: 'Cross-column move', done: true },
         { id: crypto.randomUUID(), title: 'Settle animation', done: false },
       ],
-      createdAt: now,
-      updatedAt: now,
+      createdAt: aged,
+      updatedAt: aged,
+      columnEnteredAt: aged,
+      completedAt: null,
       order: 0,
     },
     {
@@ -88,6 +100,8 @@ export function createSeedBoard(): BoardState {
       ],
       createdAt: now,
       updatedAt: now,
+      columnEnteredAt: now,
+      completedAt: null,
       order: 1,
     },
     {
@@ -108,6 +122,8 @@ export function createSeedBoard(): BoardState {
       subtasks: [{ id: crypto.randomUUID(), title: 'Trademark scan', done: true }],
       createdAt: now,
       updatedAt: now,
+      columnEnteredAt: now,
+      completedAt: now,
       order: 0,
     },
   ]
@@ -138,5 +154,6 @@ export function createSeedBoard(): BoardState {
       },
     ],
     dailyCompletions: {},
+    wipLimit: DEFAULT_WIP_LIMIT,
   }
 }

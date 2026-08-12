@@ -8,12 +8,14 @@ import type {
   Subtask,
   Task,
 } from '../types'
-import { PRIORITY_RANK } from '../types'
+import { ALL_COLUMN_IDS, DEFAULT_WIP_LIMIT, PRIORITY_RANK } from '../types'
+import { createSeedBoard } from '../seed'
 import {
   cloneBoard,
   downloadJson,
   exportBoard,
   loadBoard,
+  mergeBoards,
   parseImport,
   saveBoard,
 } from '../storage'
@@ -27,15 +29,25 @@ function reindexAll(tasks: Task[]): Task[] {
     planning: [],
     in_progress: [],
     completed: [],
+    archive: [],
   }
   for (const task of tasks) byColumn[task.columnId].push(task)
   const next: Task[] = []
-  for (const columnId of Object.keys(byColumn) as ColumnId[]) {
+  for (const columnId of ALL_COLUMN_IDS) {
     byColumn[columnId]
       .sort((a, b) => a.order - b.order)
       .forEach((task, index) => next.push({ ...task, order: index }))
   }
   return next
+}
+
+function emptyColumnMap(): Record<ColumnId, Task[]> {
+  return {
+    planning: [],
+    in_progress: [],
+    completed: [],
+    archive: [],
+  }
 }
 
 export function useBoard() {
@@ -47,14 +59,14 @@ export function useBoard() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = board.theme
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (meta) {
+      meta.setAttribute('content', board.theme === 'light' ? '#e7ebf3' : '#171a21')
+    }
   }, [board.theme])
 
   const tasksByColumn = useMemo(() => {
-    const map: Record<ColumnId, Task[]> = {
-      planning: [],
-      in_progress: [],
-      completed: [],
-    }
+    const map = emptyColumnMap()
     for (const task of sortTasks(board.tasks)) {
       map[task.columnId].push(task)
     }
@@ -79,6 +91,29 @@ export function useBoard() {
     setBoard((prev) => ({ ...prev, theme }))
   }, [])
 
+  const setName = useCallback((name: string) => {
+    const next = name.trim() || 'Orbit Board'
+    setBoard((prev) => ({ ...prev, name: next }))
+  }, [])
+
+  const setWipLimit = useCallback((wipLimit: number) => {
+    setBoard((prev) => ({
+      ...prev,
+      wipLimit: Number.isFinite(wipLimit) ? Math.max(0, Math.round(wipLimit)) : DEFAULT_WIP_LIMIT,
+    }))
+  }, [])
+
+  const wouldExceedWip = useCallback(
+    (taskId: string, toColumn: ColumnId) => {
+      if (toColumn !== 'in_progress') return false
+      if (board.wipLimit <= 0) return false
+      const task = board.tasks.find((item) => item.id === taskId)
+      if (task?.columnId === 'in_progress') return false
+      return tasksByColumn.in_progress.length >= board.wipLimit
+    },
+    [board.tasks, board.wipLimit, tasksByColumn.in_progress.length],
+  )
+
   const addTask = useCallback(
     (input: {
       title: string
@@ -89,10 +124,11 @@ export function useBoard() {
       dueDate?: string | null
     }) => {
       const now = new Date().toISOString()
+      const createdId = crypto.randomUUID()
       setBoard((prev) => {
         const columnTasks = prev.tasks.filter((t) => t.columnId === input.columnId)
         const task: Task = {
-          id: crypto.randomUUID(),
+          id: createdId,
           title: input.title.trim() || 'Untitled task',
           description: (input.description || '').trim(),
           columnId: input.columnId,
@@ -103,10 +139,13 @@ export function useBoard() {
           subtasks: [],
           createdAt: now,
           updatedAt: now,
+          columnEnteredAt: now,
+          completedAt: input.columnId === 'completed' ? now : null,
           order: columnTasks.length,
         }
         return { ...prev, tasks: [...prev.tasks, task] }
       })
+      return createdId
     },
     [],
   )
@@ -115,9 +154,14 @@ export function useBoard() {
     const now = new Date().toISOString()
     setBoard((prev) => ({
       ...prev,
-      tasks: prev.tasks.map((task) =>
-        task.id === id ? { ...task, ...patch, updatedAt: now } : task,
-      ),
+      tasks: prev.tasks.map((task) => {
+        if (task.id !== id) return task
+        const rest = { ...patch }
+        delete rest.columnId
+        delete rest.order
+        delete rest.id
+        return { ...task, ...rest, updatedAt: now }
+      }),
     }))
   }, [])
 
@@ -133,21 +177,40 @@ export function useBoard() {
       setBoard((prev) => {
         const task = prev.tasks.find((t) => t.id === taskId)
         if (!task) return prev
+        if (
+          toColumn === 'in_progress' &&
+          task.columnId !== 'in_progress' &&
+          prev.wipLimit > 0
+        ) {
+          const inProgressCount = prev.tasks.filter(
+            (item) => item.columnId === 'in_progress' && item.id !== taskId,
+          ).length
+          if (inProgressCount >= prev.wipLimit) return prev
+        }
 
         const others = prev.tasks.filter((t) => t.id !== taskId)
         const destination = others
           .filter((t) => t.columnId === toColumn)
           .sort((a, b) => a.order - b.order)
 
+        const now = new Date().toISOString()
+        const columnChanged = task.columnId !== toColumn
         const moved: Task = {
           ...task,
           columnId: toColumn,
-          updatedAt: new Date().toISOString(),
+          updatedAt: now,
+          columnEnteredAt: columnChanged ? now : task.columnEnteredAt,
+          completedAt:
+            toColumn === 'completed' && columnChanged
+              ? now
+              : toColumn === 'archive'
+                ? task.completedAt || now
+                : task.completedAt,
         }
         destination.splice(Math.max(0, Math.min(toIndex, destination.length)), 0, moved)
 
         const next: Task[] = []
-        for (const columnId of ['planning', 'in_progress', 'completed'] as ColumnId[]) {
+        for (const columnId of ALL_COLUMN_IDS) {
           const list =
             columnId === toColumn
               ? destination
@@ -163,6 +226,88 @@ export function useBoard() {
     },
     [],
   )
+
+  const archiveCompleted = useCallback(() => {
+    setBoard((prev) => {
+      const now = new Date().toISOString()
+      const archived = prev.tasks
+        .filter((t) => t.columnId === 'completed')
+        .sort((a, b) => a.order - b.order)
+      const archiveTail = prev.tasks
+        .filter((t) => t.columnId === 'archive')
+        .sort((a, b) => a.order - b.order)
+      const others = prev.tasks.filter(
+        (t) => t.columnId !== 'completed' && t.columnId !== 'archive',
+      )
+      const nextArchive = [
+        ...archiveTail,
+        ...archived.map((task) => ({
+          ...task,
+          columnId: 'archive' as const,
+          updatedAt: now,
+          columnEnteredAt: now,
+          completedAt: task.completedAt || now,
+        })),
+      ].map((task, index) => ({ ...task, order: index }))
+      return { ...prev, tasks: reindexAll([...others, ...nextArchive]) }
+    })
+  }, [])
+
+  const restoreTask = useCallback((id: string, toColumn: ColumnId = 'planning') => {
+    setBoard((prev) => {
+      const task = prev.tasks.find((t) => t.id === id)
+      if (!task) return prev
+      const now = new Date().toISOString()
+      const others = prev.tasks.filter((t) => t.id !== id)
+      const destination = others
+        .filter((t) => t.columnId === toColumn)
+        .sort((a, b) => a.order - b.order)
+      destination.push({
+        ...task,
+        columnId: toColumn,
+        updatedAt: now,
+        columnEnteredAt: now,
+      })
+      const next: Task[] = []
+      for (const columnId of ALL_COLUMN_IDS) {
+        const list =
+          columnId === toColumn
+            ? destination
+            : others
+                .filter((t) => t.columnId === columnId)
+                .sort((a, b) => a.order - b.order)
+        list.forEach((item, index) => next.push({ ...item, columnId, order: index }))
+      }
+      return { ...prev, tasks: next }
+    })
+  }, [])
+
+  const duplicateTask = useCallback((id: string) => {
+    const createdId = crypto.randomUUID()
+    setBoard((prev) => {
+      const task = prev.tasks.find((t) => t.id === id)
+      if (!task) return prev
+      const now = new Date().toISOString()
+      const columnTasks = prev.tasks.filter((t) => t.columnId === task.columnId)
+      const copy: Task = {
+        ...task,
+        id: createdId,
+        title: `${task.title} (copy)`,
+        comments: [],
+        subtasks: task.subtasks.map((item) => ({
+          ...item,
+          id: crypto.randomUUID(),
+        })),
+        createdAt: now,
+        updatedAt: now,
+        columnEnteredAt: now,
+        completedAt: task.columnId === 'completed' ? now : null,
+        order: columnTasks.length,
+      }
+      return { ...prev, tasks: [...prev.tasks, copy] }
+    })
+    return createdId
+  }, [])
 
   const addComment = useCallback((taskId: string, body: string) => {
     const text = body.trim()
@@ -196,17 +341,6 @@ export function useBoard() {
               comments: task.comments.filter((c) => c.id !== commentId),
               updatedAt: new Date().toISOString(),
             }
-          : task,
-      ),
-    }))
-  }, [])
-
-  const setSubtasks = useCallback((taskId: string, subtasks: Subtask[]) => {
-    setBoard((prev) => ({
-      ...prev,
-      tasks: prev.tasks.map((task) =>
-        task.id === taskId
-          ? { ...task, subtasks, updatedAt: new Date().toISOString() }
           : task,
       ),
     }))
@@ -262,13 +396,6 @@ export function useBoard() {
     }))
   }, [])
 
-  const clearColumn = useCallback((columnId: ColumnId) => {
-    setBoard((prev) => ({
-      ...prev,
-      tasks: reindexAll(prev.tasks.filter((t) => t.columnId !== columnId)),
-    }))
-  }, [])
-
   const sortColumn = useCallback((columnId: ColumnId, mode: ColumnSort) => {
     if (mode === 'manual') return
     setBoard((prev) => {
@@ -278,7 +405,6 @@ export function useBoard() {
           if (mode === 'priority') {
             return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]
           }
-          // due
           if (!a.dueDate && !b.dueDate) return a.order - b.order
           if (!a.dueDate) return 1
           if (!b.dueDate) return -1
@@ -330,15 +456,39 @@ export function useBoard() {
     })
   }, [])
 
+  const reorderDailyGoals = useCallback((fromIndex: number, toIndex: number) => {
+    setBoard((prev) => {
+      const goals = [...(prev.dailyGoals || [])].sort((a, b) => a.order - b.order)
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= goals.length ||
+        toIndex >= goals.length
+      ) {
+        return prev
+      }
+      const [moved] = goals.splice(fromIndex, 1)
+      goals.splice(toIndex, 0, moved)
+      return {
+        ...prev,
+        dailyGoals: goals.map((goal, index) => ({ ...goal, order: index })),
+      }
+    })
+  }, [])
+
+  const resetDemo = useCallback(() => {
+    setBoard(createSeedBoard())
+  }, [])
+
   const exportData = useCallback(() => {
     const stamp = new Date().toISOString().slice(0, 10)
     downloadJson(`orbit-board-${stamp}.json`, exportBoard(board))
   }, [board])
 
-  const importData = useCallback(async (file: File) => {
+  const importData = useCallback(async (file: File, mode: 'replace' | 'merge' = 'replace') => {
     const text = await file.text()
-    const next = parseImport(text)
-    setBoard(next)
+    const incoming = parseImport(text)
+    setBoard((prev) => (mode === 'merge' ? mergeBoards(prev, incoming) : incoming))
   }, [])
 
   return {
@@ -348,21 +498,27 @@ export function useBoard() {
     snapshot,
     replaceBoard,
     setTheme,
+    setName,
+    setWipLimit,
+    wouldExceedWip,
     addTask,
     updateTask,
     deleteTask,
     moveTask,
+    archiveCompleted,
+    restoreTask,
+    duplicateTask,
     addComment,
     deleteComment,
-    setSubtasks,
     addSubtask,
     toggleSubtask,
     deleteSubtask,
-    clearColumn,
     sortColumn,
     addDailyGoal,
     deleteDailyGoal,
     toggleDailyGoal,
+    reorderDailyGoals,
+    resetDemo,
     exportData,
     importData,
   }

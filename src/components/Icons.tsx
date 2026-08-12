@@ -362,3 +362,69 @@ export function IconTarget({ size = 24, className }: IconProps) {
     </Svg>
   )
 }
+
+export function IconArchive({ size = 24, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <path
+        d="M4.5 7.2 6 4.8h12l1.5 2.4v2.2H4.5V7.2Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6 9.4h12v9.2a1.6 1.6 0 0 1-1.6 1.6H7.6A1.6 1.6 0 0 1 6 18.6V9.4Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+      <path
+        d="M9.5 13.2h5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </Svg>
+  )
+}
+
+export function IconCopy({ size = 24, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <rect
+        x="8"
+        y="8"
+        width="11"
+        height="11"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+      <path
+        d="M6 15.5H5.2A1.2 1.2 0 0 1 4 14.3V5.2A1.2 1.2 0 0 1 5.2 4h9.1A1.2 1.2 0 0 1 15.5 5.2V6"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </Svg>
+  )
+}
+
+export function IconReset({ size = 24, className }: IconProps) {
+  return (
+    <Svg size={size} className={className}>
+      <path
+        d="M5.2 12a6.8 6.8 0 1 0 2-4.8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M5 5.5v4.2h4.2"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  )
+}

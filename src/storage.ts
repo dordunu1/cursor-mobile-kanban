@@ -1,5 +1,5 @@
 import type { BoardState, DailyGoal, Subtask, Task } from './types'
-import { STORAGE_KEY } from './types'
+import { DEFAULT_WIP_LIMIT, STORAGE_KEY } from './types'
 import { createSeedBoard } from './seed'
 
 function normalizeSubtasks(raw: unknown): Subtask[] {
@@ -14,15 +14,21 @@ function normalizeSubtasks(raw: unknown): Subtask[] {
   })
 }
 
+function normalizeColumnId(value: unknown): Task['columnId'] {
+  if (value === 'in_progress' || value === 'completed' || value === 'archive') {
+    return value
+  }
+  return 'planning'
+}
+
 function normalizeTask(task: Partial<Task>, index: number): Task {
+  const columnId = normalizeColumnId(task.columnId)
+  const updatedAt = task.updatedAt || new Date().toISOString()
   return {
     id: task.id || crypto.randomUUID(),
     title: task.title || 'Untitled',
     description: task.description || '',
-    columnId:
-      task.columnId === 'in_progress' || task.columnId === 'completed'
-        ? task.columnId
-        : 'planning',
+    columnId,
     priority:
       task.priority === 'high' || task.priority === 'low' ? task.priority : 'medium',
     tags: Array.isArray(task.tags) ? task.tags.map(String) : [],
@@ -36,7 +42,10 @@ function normalizeTask(task: Partial<Task>, index: number): Task {
       : [],
     subtasks: normalizeSubtasks(task.subtasks),
     createdAt: task.createdAt || new Date().toISOString(),
-    updatedAt: task.updatedAt || new Date().toISOString(),
+    updatedAt,
+    columnEnteredAt: task.columnEnteredAt || updatedAt,
+    completedAt:
+      task.completedAt ?? (columnId === 'completed' || columnId === 'archive' ? updatedAt : null),
     order: typeof task.order === 'number' ? task.order : index,
   }
 }
@@ -89,7 +98,7 @@ function defaultDailyGoals(): DailyGoal[] {
   ]
 }
 
-function normalizeBoard(parsed: BoardState): BoardState {
+export function normalizeBoard(parsed: BoardState): BoardState {
   return {
     version: 1,
     name: parsed.name || 'Orbit Board',
@@ -100,6 +109,10 @@ function normalizeBoard(parsed: BoardState): BoardState {
         ? defaultDailyGoals()
         : normalizeDailyGoals(parsed.dailyGoals),
     dailyCompletions: normalizeCompletions(parsed.dailyCompletions),
+    wipLimit:
+      typeof parsed.wipLimit === 'number' && parsed.wipLimit >= 0
+        ? parsed.wipLimit
+        : DEFAULT_WIP_LIMIT,
   }
 }
 
@@ -125,6 +138,7 @@ export function saveBoard(state: BoardState): void {
     theme: state.theme,
     dailyGoals: state.dailyGoals,
     dailyCompletions: state.dailyCompletions,
+    wipLimit: state.wipLimit,
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
 }
@@ -144,6 +158,34 @@ export function parseImport(json: string): BoardState {
     throw new Error('Invalid Orbit Board file')
   }
   return normalizeBoard(parsed)
+}
+
+export function mergeBoards(current: BoardState, incoming: BoardState): BoardState {
+  const incomingTasks = incoming.tasks.map((task) => ({
+    ...task,
+    id: crypto.randomUUID(),
+    comments: task.comments.map((comment) => ({
+      ...comment,
+      id: crypto.randomUUID(),
+    })),
+    subtasks: task.subtasks.map((subtask) => ({
+      ...subtask,
+      id: crypto.randomUUID(),
+    })),
+  }))
+  const incomingGoals = incoming.dailyGoals.map((goal, index) => ({
+    ...goal,
+    id: crypto.randomUUID(),
+    order: current.dailyGoals.length + index,
+  }))
+  return {
+    ...current,
+    name: current.name,
+    theme: current.theme,
+    wipLimit: current.wipLimit,
+    tasks: [...current.tasks, ...incomingTasks],
+    dailyGoals: [...current.dailyGoals, ...incomingGoals],
+  }
 }
 
 export function downloadJson(filename: string, contents: string): void {
