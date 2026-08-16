@@ -7,7 +7,7 @@ import { ConfirmDialog } from './components/ConfirmDialog'
 import { DailyGoals } from './components/DailyGoals'
 import { FilterBar } from './components/FilterBar'
 import { ImportDialog } from './components/ImportDialog'
-import { GlassScene, LiquidGlassFilters } from './components/LiquidGlassFilters'
+import { GlassScene } from './components/LiquidGlassFilters'
 import { NewTaskModal } from './components/NewTaskModal'
 import { TaskDetail } from './components/TaskDetail'
 import { Toolbar } from './components/Toolbar'
@@ -67,6 +67,9 @@ export default function App() {
   const wipWarned = useRef(false)
 
   useEffect(() => {
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)')
+    if (!finePointer.matches) return
+
     const onMove = (event: PointerEvent) => {
       document.documentElement.style.setProperty('--spot-x', `${event.clientX}px`)
       document.documentElement.style.setProperty('--spot-y', `${event.clientY}px`)
@@ -183,7 +186,6 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <LiquidGlassFilters />
       <GlassScene />
       <div className="glass-spot" aria-hidden="true" />
       <ConfettiBurst token={confettiToken} />
