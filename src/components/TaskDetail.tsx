@@ -3,6 +3,7 @@ import { useFocusTrap } from '../hooks/useFocusTrap'
 import type { ColumnId, Priority, Task } from '../types'
 import { COLUMNS } from '../types'
 import { IconCheck, IconClose, IconComment, IconCopy, IconPlus, IconTrash } from './Icons'
+import { GlassSelect } from './GlassSelect'
 import { MarkdownBody } from './MarkdownBody'
 
 export function TaskDetail({
@@ -133,32 +134,33 @@ export function TaskDetail({
           <div className="form-row two">
             <div className="field">
               <label htmlFor="task-column">Status</label>
-              <select
+              <GlassSelect
                 id="task-column"
+                ariaLabel="Status"
                 value={columnId}
-                onChange={(e) => setColumnId(e.target.value as ColumnId)}
-              >
-                {statusOptions.map((column) => (
-                  <option key={column.id} value={column.id}>
-                    {column.title}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setColumnId(value as ColumnId)}
+                options={statusOptions.map((column) => ({
+                  value: column.id,
+                  label: column.title,
+                }))}
+              />
               {wipBlocked && columnId === 'in_progress' && task.columnId !== 'in_progress' ? (
                 <p className="field-hint">In Progress is at its WIP limit.</p>
               ) : null}
             </div>
             <div className="field">
               <label htmlFor="task-priority">Priority</label>
-              <select
+              <GlassSelect
                 id="task-priority"
+                ariaLabel="Priority"
                 value={priority}
-                onChange={(e) => setPriority(e.target.value as Priority)}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
+                onChange={(value) => setPriority(value as Priority)}
+                options={[
+                  { value: 'low', label: 'Low' },
+                  { value: 'medium', label: 'Medium' },
+                  { value: 'high', label: 'High' },
+                ]}
+              />
             </div>
           </div>
           <div className="form-row two">

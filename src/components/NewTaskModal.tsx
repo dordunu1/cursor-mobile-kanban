@@ -3,6 +3,7 @@ import { useFocusTrap } from '../hooks/useFocusTrap'
 import type { BoardColumnId, Priority } from '../types'
 import { COLUMNS } from '../types'
 import { IconClose, IconPlus } from './Icons'
+import { GlassSelect } from './GlassSelect'
 
 export function NewTaskModal({
   onClose,
@@ -98,29 +99,30 @@ export function NewTaskModal({
           <div className="form-row two">
             <div className="field">
               <label htmlFor="new-column">Status</label>
-              <select
+              <GlassSelect
                 id="new-column"
+                ariaLabel="Status"
                 value={columnId}
-                onChange={(e) => setColumnId(e.target.value as BoardColumnId)}
-              >
-                {COLUMNS.map((column) => (
-                  <option key={column.id} value={column.id}>
-                    {column.title}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setColumnId(value as BoardColumnId)}
+                options={COLUMNS.map((column) => ({
+                  value: column.id,
+                  label: column.title,
+                }))}
+              />
             </div>
             <div className="field">
               <label htmlFor="new-priority">Priority</label>
-              <select
+              <GlassSelect
                 id="new-priority"
+                ariaLabel="Priority"
                 value={priority}
-                onChange={(e) => setPriority(e.target.value as Priority)}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
+                onChange={(value) => setPriority(value as Priority)}
+                options={[
+                  { value: 'low', label: 'Low' },
+                  { value: 'medium', label: 'Medium' },
+                  { value: 'high', label: 'High' },
+                ]}
+              />
             </div>
           </div>
           <div className="form-row two">
