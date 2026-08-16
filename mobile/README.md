@@ -24,18 +24,22 @@ Scan the QR code with:
 
 ## Build Android APK (GitHub Releases)
 
+The APK must be a **release** build (JS bundle packaged inside). A debug APK will crash with “Unable to load script / make sure you are running Metro”.
+
 1. Push a tag:
 
 ```bash
-git tag mobile-v1.0.0
-git push origin mobile-v1.0.0
+git tag mobile-v1.0.1
+git push origin mobile-v1.0.1
 ```
 
 2. Open the repo **Actions** tab → workflow **Build Android APK**.
-3. When it finishes, open **Releases** and download `orbit-board.apk`.
+3. When it finishes, open **Releases** and download `orbit-board.apk` (or the workflow artifact named `orbit-board-apk`).
 4. On your phone, allow install from unknown apps for the browser/Files app, then install the APK.
 
 You can also run the workflow manually via **Actions → Build Android APK → Run workflow**. The APK is uploaded as a workflow artifact even without a tag.
+
+Uninstall any previous Orbit Board install first if Android blocks the update (signing key may differ between builds).
 
 ## Local Android APK (optional)
 

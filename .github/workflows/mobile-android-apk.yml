@@ -38,17 +38,113 @@ jobs:
       - name: Generate native Android project
         run: npx expo prebuild --platform android --non-interactive
 
-      - name: Build installable APK
-        working-directory: mobile/android
+      - name: Create release keystore + signing config
         run: |
-          # Debug-signed APK installs after enabling "Install unknown apps".
-          ./gradlew assembleDebug --no-daemon
+          keytool -genkeypair -v \
+            -storetype PKCS12 \
+            -keystore android/app/orbit-release.keystore \
+            -alias orbit \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass orbitboard \
+            -keypass orbitboard \
+            -dname "CN=Orbit Board, OU=Mobile, O=Orbit, L=Internet, ST=NA, C=US"
 
-      - name: Stage APK
+          cat > android/keystore.properties <<'EOF'
+          storePassword=orbitboard
+          keyPassword=orbitboard
+          keyAlias=orbit
+          storeFile=orbit-release.keystore
+          EOF
+
+          python3 <<'PY'
+          from pathlib import Path
+
+          path = Path("android/app/build.gradle")
+          text = path.read_text()
+          if "orbitRelease" in text:
+              print("signing already present")
+              raise SystemExit(0)
+
+          # Expo/RN templates use Groovy build.gradle. Inject a signingConfigs block
+          # and force the release buildType to use it.
+          android_idx = text.find("android {")
+          if android_idx < 0:
+              raise SystemExit("android { not found")
+
+          insert_at = text.find("\n", android_idx) + 1
+          preamble = """
+      def keystorePropertiesFile = rootProject.file("keystore.properties")
+      def keystoreProperties = new Properties()
+      if (keystorePropertiesFile.exists()) {
+          keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+      }
+
+      signingConfigs {
+          orbitRelease {
+              keyAlias keystoreProperties['keyAlias']
+              keyPassword keystoreProperties['keyPassword']
+              storeFile file(keystoreProperties['storeFile'])
+              storePassword keystoreProperties['storePassword']
+          }
+      }
+
+"""
+          text = text[:insert_at] + preamble + text[insert_at:]
+
+          needle = "release {"
+          rel = text.find(needle)
+          if rel < 0:
+              raise SystemExit("release { buildType not found")
+          # Insert right after "release {"
+          after = rel + len(needle)
+          text = (
+              text[:after]
+              + "\n            signingConfig signingConfigs.orbitRelease"
+              + text[after:]
+          )
+          path.write_text(text)
+          print("Patched release signingConfig")
+          PY
+
+      - name: Bundle JS into Android assets (explicit)
         run: |
-          DEBUG_APK=$(ls android/app/build/outputs/apk/debug/*.apk | head -n 1)
-          cp "$DEBUG_APK" orbit-board.apk
+          set -euo pipefail
+          mkdir -p android/app/src/main/assets
+          # Ensures the APK works offline without Metro. assembleRelease also
+          # bundles, but this makes the failure mode obvious in CI logs.
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.ts \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res \
+            --minify true
+          ls -lh android/app/src/main/assets/index.android.bundle
+
+      - name: Build release APK
+        working-directory: mobile/android
+        env:
+          NODE_ENV: production
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Stage + verify APK contains JS bundle
+        run: |
+          set -euo pipefail
+          RELEASE_APK=$(ls android/app/build/outputs/apk/release/*.apk | head -n 1)
+          cp "$RELEASE_APK" orbit-board.apk
           ls -lh orbit-board.apk
+          rm -rf /tmp/orbit-apk-check
+          mkdir -p /tmp/orbit-apk-check
+          unzip -q orbit-board.apk -d /tmp/orbit-apk-check
+          if ! find /tmp/orbit-apk-check -type f \( -name 'index.android.bundle' -o -name '*.bundle' \) | grep -q .; then
+            echo "ERROR: APK is missing the JS bundle (would show Metro error on phone)" >&2
+            find /tmp/orbit-apk-check -maxdepth 4 -type f | head -120 >&2
+            exit 1
+          fi
+          echo "JS bundle found:"
+          find /tmp/orbit-apk-check -type f \( -name 'index.android.bundle' -o -name '*.bundle' \)
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -63,5 +159,13 @@ jobs:
           files: mobile/orbit-board.apk
           generate_release_notes: true
           name: Orbit Board ${{ github.ref_name }}
+          body: |
+            Installable **release** APK with the JavaScript bundle packaged inside.
+
+            1. Uninstall any older Orbit Board build first (signing may differ).
+            2. Allow install from unknown apps.
+            3. Open `orbit-board.apk`.
+
+            This is **not** a debug/Metro build.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

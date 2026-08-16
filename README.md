@@ -11,7 +11,7 @@ A local-first Kanban with Apple Liquid Glass materials, zPayy blue (`#2f6bff`) w
 Native iOS + Android app lives in [`mobile/`](./mobile/).
 
 - **iOS (Expo Go):** `cd mobile && npm install && npx expo start` — scan the QR with Expo Go
-- **Android APK:** push a `mobile-v*` tag (or run **Actions → Build Android APK**) and download from **Releases** / workflow artifacts
+- **Android APK:** run **Actions → Build Android APK** (or push a `mobile-v*` tag) and download the **release** artifact `orbit-board-apk` / Release asset. Use a release build only — a debug APK needs Metro and will show “Unable to load script”.
 
 See [`mobile/README.md`](./mobile/README.md) for details. The web board stays at the repo root.
 
