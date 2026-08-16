@@ -1,7 +1,8 @@
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { BoardColumnId, ColumnSort, Task } from '../types'
+import { GlassFloatMenu } from './GlassSelect'
 import {
   IconCompleted,
   IconMore,
@@ -54,18 +55,10 @@ export function Column({
   const Icon = COLUMN_ICONS[id]
   const [draft, setDraft] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
+  const menuBtnRef = useRef<HTMLButtonElement>(null)
   const atWip =
     id === 'in_progress' && wipLimit > 0 && wipCount >= wipLimit
-
-  useEffect(() => {
-    if (!menuOpen) return
-    const onPointer = (event: MouseEvent) => {
-      if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false)
-    }
-    window.addEventListener('mousedown', onPointer)
-    return () => window.removeEventListener('mousedown', onPointer)
-  }, [menuOpen])
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
 
   const submitQuick = () => {
     const value = draft.trim()
@@ -99,91 +92,112 @@ export function Column({
               ? `${wipCount}/${wipLimit}`
               : tasks.length}
           </span>
-          <div className="column-menu" ref={menuRef}>
+          <div className="column-menu">
             <button
+              ref={menuBtnRef}
               className="icon-btn neu-btn column-menu-btn"
               aria-label={`${title} actions`}
               aria-expanded={menuOpen}
+              aria-haspopup="menu"
               onClick={() => setMenuOpen((v) => !v)}
             >
               <IconMore size={18} />
             </button>
-            {menuOpen ? (
-              <div className="column-menu-panel" role="menu">
-                <button
-                  role="menuitem"
-                  onClick={() => {
-                    onSort('due')
-                    setMenuOpen(false)
-                  }}
-                >
-                  Sort by due date
-                </button>
-                <button
-                  role="menuitem"
-                  onClick={() => {
-                    onSort('priority')
-                    setMenuOpen(false)
-                  }}
-                >
-                  Sort by priority
-                </button>
-                {id === 'in_progress' ? (
-                  <>
-                    <button
-                      role="menuitem"
-                      onClick={() => {
-                        onSetWipLimit(3)
-                        setMenuOpen(false)
-                      }}
-                    >
-                      WIP limit: 3
-                    </button>
-                    <button
-                      role="menuitem"
-                      onClick={() => {
-                        onSetWipLimit(5)
-                        setMenuOpen(false)
-                      }}
-                    >
-                      WIP limit: 5
-                    </button>
-                    <button
-                      role="menuitem"
-                      onClick={() => {
-                        onSetWipLimit(0)
-                        setMenuOpen(false)
-                      }}
-                    >
-                      WIP unlimited
-                    </button>
-                  </>
-                ) : null}
-                {id === 'completed' ? (
+            <GlassFloatMenu
+              open={menuOpen}
+              anchorRef={menuBtnRef}
+              onClose={closeMenu}
+              align="right"
+              minWidth={196}
+              role="menu"
+              ariaLabel={`${title} actions`}
+            >
+              <button
+                type="button"
+                role="menuitem"
+                className="glass-select-option"
+                onClick={() => {
+                  onSort('due')
+                  closeMenu()
+                }}
+              >
+                Sort by due date
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                className="glass-select-option"
+                onClick={() => {
+                  onSort('priority')
+                  closeMenu()
+                }}
+              >
+                Sort by priority
+              </button>
+              {id === 'in_progress' ? (
+                <>
                   <button
+                    type="button"
                     role="menuitem"
+                    className="glass-select-option"
                     onClick={() => {
-                      onToggleCollapsed()
-                      setMenuOpen(false)
+                      onSetWipLimit(3)
+                      closeMenu()
                     }}
                   >
-                    {collapsed ? 'Expand completed' : 'Collapse completed'}
+                    WIP limit: 3
                   </button>
-                ) : null}
-                {id === 'completed' ? (
                   <button
+                    type="button"
                     role="menuitem"
-                    className="danger"
+                    className="glass-select-option"
                     onClick={() => {
-                      onClear()
-                      setMenuOpen(false)
+                      onSetWipLimit(5)
+                      closeMenu()
                     }}
                   >
-                    Archive completed
+                    WIP limit: 5
                   </button>
-                ) : null}
-              </div>
-            ) : null}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="glass-select-option"
+                    onClick={() => {
+                      onSetWipLimit(0)
+                      closeMenu()
+                    }}
+                  >
+                    WIP unlimited
+                  </button>
+                </>
+              ) : null}
+              {id === 'completed' ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="glass-select-option"
+                  onClick={() => {
+                    onToggleCollapsed()
+                    closeMenu()
+                  }}
+                >
+                  {collapsed ? 'Expand completed' : 'Collapse completed'}
+                </button>
+              ) : null}
+              {id === 'completed' ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="glass-select-option is-danger"
+                  onClick={() => {
+                    onClear()
+                    closeMenu()
+                  }}
+                >
+                  Archive completed
+                </button>
+              ) : null}
+            </GlassFloatMenu>
           </div>
         </div>
       </header>

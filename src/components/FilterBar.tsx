@@ -1,4 +1,5 @@
 import { IconSearch } from './Icons'
+import { GlassSelect } from './GlassSelect'
 import type { BoardFilters, DueFilter, PriorityFilter } from '../types'
 import { emptyFilters, filtersAreActive } from '../types'
 
@@ -26,49 +27,51 @@ export function FilterBar({
       </label>
 
       <div className="filter-controls">
-        <label className="filter-field">
+        <div className="filter-field">
           <span>Priority</span>
-          <select
+          <GlassSelect
+            ariaLabel="Filter by priority"
             value={filters.priority}
-            onChange={(e) =>
-              onChange({ ...filters, priority: e.target.value as PriorityFilter })
+            onChange={(value) =>
+              onChange({ ...filters, priority: value as PriorityFilter })
             }
-          >
-            <option value="all">All</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
-        </label>
+            options={[
+              { value: 'all', label: 'All' },
+              { value: 'high', label: 'High' },
+              { value: 'medium', label: 'Medium' },
+              { value: 'low', label: 'Low' },
+            ]}
+          />
+        </div>
 
-        <label className="filter-field">
+        <div className="filter-field">
           <span>Due</span>
-          <select
+          <GlassSelect
+            ariaLabel="Filter by due date"
             value={filters.due}
-            onChange={(e) => onChange({ ...filters, due: e.target.value as DueFilter })}
-          >
-            <option value="all">All</option>
-            <option value="overdue">Overdue</option>
-            <option value="today">Today</option>
-            <option value="soon">Due soon</option>
-            <option value="none">No date</option>
-          </select>
-        </label>
+            onChange={(value) => onChange({ ...filters, due: value as DueFilter })}
+            options={[
+              { value: 'all', label: 'All' },
+              { value: 'overdue', label: 'Overdue' },
+              { value: 'today', label: 'Today' },
+              { value: 'soon', label: 'Due soon' },
+              { value: 'none', label: 'No date' },
+            ]}
+          />
+        </div>
 
-        <label className="filter-field">
+        <div className="filter-field">
           <span>Tag</span>
-          <select
+          <GlassSelect
+            ariaLabel="Filter by tag"
             value={filters.tag}
-            onChange={(e) => onChange({ ...filters, tag: e.target.value })}
-          >
-            <option value="">All tags</option>
-            {tags.map((tag) => (
-              <option key={tag} value={tag}>
-                {tag}
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={(value) => onChange({ ...filters, tag: value })}
+            options={[
+              { value: '', label: 'All tags' },
+              ...tags.map((tag) => ({ value: tag, label: tag })),
+            ]}
+          />
+        </div>
 
         {active ? (
           <button

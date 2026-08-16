@@ -7,6 +7,7 @@ import { ConfirmDialog } from './components/ConfirmDialog'
 import { DailyGoals } from './components/DailyGoals'
 import { FilterBar } from './components/FilterBar'
 import { ImportDialog } from './components/ImportDialog'
+import { GlassScene, LiquidGlassFilters } from './components/LiquidGlassFilters'
 import { NewTaskModal } from './components/NewTaskModal'
 import { TaskDetail } from './components/TaskDetail'
 import { Toolbar } from './components/Toolbar'
@@ -64,6 +65,15 @@ export default function App() {
   const [confirmReset, setConfirmReset] = useState(false)
   const dragSnapshot = useRef<BoardState | null>(null)
   const wipWarned = useRef(false)
+
+  useEffect(() => {
+    const onMove = (event: PointerEvent) => {
+      document.documentElement.style.setProperty('--spot-x', `${event.clientX}px`)
+      document.documentElement.style.setProperty('--spot-y', `${event.clientY}px`)
+    }
+    window.addEventListener('pointermove', onMove, { passive: true })
+    return () => window.removeEventListener('pointermove', onMove)
+  }, [])
 
   useEffect(() => {
     if (!undo && !toast) return
@@ -173,8 +183,9 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <div className="ambient ambient-a" aria-hidden="true" />
-      <div className="ambient ambient-b" aria-hidden="true" />
+      <LiquidGlassFilters />
+      <GlassScene />
+      <div className="glass-spot" aria-hidden="true" />
       <ConfettiBurst token={confettiToken} />
       <div className="app-frame">
         <Toolbar

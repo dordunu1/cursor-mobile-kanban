@@ -61,7 +61,7 @@ export function useBoard() {
     document.documentElement.dataset.theme = board.theme
     const meta = document.querySelector('meta[name="theme-color"]')
     if (meta) {
-      meta.setAttribute('content', board.theme === 'light' ? '#e7ebf3' : '#171a21')
+      meta.setAttribute('content', board.theme === 'light' ? '#2f6bff' : '#070b18')
     }
   }, [board.theme])
 

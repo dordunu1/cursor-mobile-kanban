@@ -132,7 +132,7 @@ export function createSeedBoard(): BoardState {
     version: 1,
     name: 'Orbit Board',
     tasks,
-    theme: 'dark',
+    theme: 'light',
     dailyGoals: [
       {
         id: crypto.randomUUID(),

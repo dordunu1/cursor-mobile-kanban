@@ -87,7 +87,7 @@ export function Toolbar({
             </button>
           )}
           <div className="brand-sub">
-            Local Kanban · {taskCount} on board
+            Liquid glass · {taskCount} on board
             {archiveCount ? ` · ${archiveCount} archived` : ''}
           </div>
         </div>
