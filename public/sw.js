@@ -1,4 +1,4 @@
-const CACHE = 'orbit-board-liquid-glass-v1'
+const CACHE = 'orbit-board-liquid-glass-v2'
 const SHELL = [
   '/cursor-mobile-kanban/liquid-glass/',
   '/cursor-mobile-kanban/liquid-glass/index.html',
@@ -29,7 +29,7 @@ self.addEventListener('fetch', (event) => {
         return response
       })
       .catch(() =>
-        caches.match(event.request).then((cached) => cached || caches.match('/cursor-mobile-kanban/')),
+        caches.match(event.request).then((cached) => cached || caches.match('/cursor-mobile-kanban/liquid-glass/')),
       ),
   )
 })
