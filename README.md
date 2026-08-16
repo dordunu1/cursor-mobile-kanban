@@ -6,6 +6,15 @@ A local-first Kanban with Apple Liquid Glass materials, zPayy blue (`#2f6bff`) w
 
 **https://dordunu1.github.io/cursor-mobile-kanban/**
 
+## Mobile app (Expo)
+
+Native iOS + Android app lives in [`mobile/`](./mobile/).
+
+- **iOS (Expo Go):** `cd mobile && npm install && npx expo start` — scan the QR with Expo Go
+- **Android APK:** push a `mobile-v*` tag (or run **Actions → Build Android APK**) and download from **Releases** / workflow artifacts
+
+See [`mobile/README.md`](./mobile/README.md) for details. The web board stays at the repo root.
+
 If the board still looks like the previous neumorphic theme, hard-refresh or open a private window — an old service worker may be caching the last build.
 
 ## Look

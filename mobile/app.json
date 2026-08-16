@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Orbit Board",
+    "slug": "orbit-board",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "orbitboard",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2f6bff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.orbitboard.mobile",
+      "buildNumber": "1"
+    },
+    "android": {
+      "package": "app.orbitboard.mobile",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#2f6bff",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-system-ui"
+    ]
+  }
+}
