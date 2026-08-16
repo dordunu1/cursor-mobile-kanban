@@ -7,6 +7,7 @@ import { ConfirmDialog } from './components/ConfirmDialog'
 import { DailyGoals } from './components/DailyGoals'
 import { FilterBar } from './components/FilterBar'
 import { ImportDialog } from './components/ImportDialog'
+import { LiquidGlassFilters } from './components/LiquidGlassFilters'
 import { NewTaskModal } from './components/NewTaskModal'
 import { TaskDetail } from './components/TaskDetail'
 import { Toolbar } from './components/Toolbar'
@@ -173,8 +174,10 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      <LiquidGlassFilters />
       <div className="ambient ambient-a" aria-hidden="true" />
       <div className="ambient ambient-b" aria-hidden="true" />
+      <div className="ambient ambient-c" aria-hidden="true" />
       <ConfettiBurst token={confettiToken} />
       <div className="app-frame">
         <Toolbar

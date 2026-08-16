@@ -1,10 +1,26 @@
-# Orbit Board
+# Orbit Board — Liquid Glass preview
 
-A local-first Kanban with a premium soft-neumorphic interface, refined ember accents, and branded iconography.
+Preview restyle of Orbit Board: Apple Liquid Glass materials, zPayy blue (`#2f6bff`) with white labels, and zPayy fonts (Instrument Serif + DM Sans). Neumorphism is gone on this branch.
 
-## Live site
+**This branch does not replace the current live board.**
 
-**https://dordunu1.github.io/cursor-mobile-kanban/**
+| Version | URL |
+|---|---|
+| Current (unchanged) | https://dordunu1.github.io/cursor-mobile-kanban/ |
+| **Liquid Glass preview** | **https://dordunu1.github.io/cursor-mobile-kanban/liquid-glass/** |
+
+If the preview still looks ember/neumorphic, hard-refresh or open a private window — the old service worker may be caching the previous build.
+
+## What changed visually
+- Translucent glass panels (`backdrop-filter` blur + saturate, specular edge, Chromium refraction filter)
+- zPayy primary `#2f6bff` / `#3b75ff` → `#2a5ef0` with white text on primary buttons
+- Instrument Serif for titles, DM Sans for UI
+- Light-first wallpaper with blue / violet / green light so the glass has color to pick up
+- Dark mode is still there: navy glass, same blue CTAs
+
+## Features
+
+Same product as the usability branch: local-first Kanban, daily goals, archive, WIP, filters, PWA.
 
 ## Features
 

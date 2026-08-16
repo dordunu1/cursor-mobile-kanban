@@ -13,7 +13,7 @@ type Particle = {
   life: number
 }
 
-const COLORS = ['#e2a46a', '#d08a4c', '#4cbf8f', '#6ea8ff', '#f2efe8', '#ef6a5d']
+const COLORS = ['#2f6bff', '#3b75ff', '#7c6cff', '#ffffff', '#1f9d6a', '#ff5c7a']
 
 export function ConfettiBurst({ token }: { token: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)

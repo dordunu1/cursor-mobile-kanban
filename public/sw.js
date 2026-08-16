@@ -1,5 +1,8 @@
-const CACHE = 'orbit-board-v2'
-const SHELL = ['/cursor-mobile-kanban/', '/cursor-mobile-kanban/index.html']
+const CACHE = 'orbit-board-liquid-glass-v1'
+const SHELL = [
+  '/cursor-mobile-kanban/liquid-glass/',
+  '/cursor-mobile-kanban/liquid-glass/index.html',
+]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
