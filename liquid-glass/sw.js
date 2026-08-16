@@ -1,4 +1,4 @@
-const CACHE = 'orbit-board-liquid-glass-v2'
+const CACHE = 'orbit-board-liquid-glass-v4'
 const SHELL = [
   '/cursor-mobile-kanban/liquid-glass/',
   '/cursor-mobile-kanban/liquid-glass/index.html',
