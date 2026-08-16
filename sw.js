@@ -1,4 +1,4 @@
-const CACHE = 'orbit-board-v2'
+const CACHE = 'orbit-board-v3'
 const SHELL = ['/cursor-mobile-kanban/', '/cursor-mobile-kanban/index.html']
 
 self.addEventListener('install', (event) => {
