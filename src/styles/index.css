@@ -105,8 +105,13 @@ body,
   min-height: 100%;
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
+  overflow-x: clip;
   font-family: var(--font-ui);
   background: var(--bg-0);
   color: var(--text);
@@ -153,15 +158,15 @@ button:disabled {
 .app-shell {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   isolation: isolate;
   background: transparent;
 }
 
 .glass-scene {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 220%;
+  position: fixed;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
@@ -292,7 +297,7 @@ button:disabled {
   z-index: 1;
   width: min(1440px, 100%);
   margin: 0 auto;
-  padding: 16px 14px 48vh;
+  padding: 16px 14px 28px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -301,7 +306,7 @@ button:disabled {
 
 @media (min-width: 900px) {
   .app-frame {
-    padding: 24px 28px 48vh;
+    padding: 24px 28px 36px;
     gap: 20px;
   }
 }
