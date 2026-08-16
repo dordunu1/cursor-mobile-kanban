@@ -1,30 +1,24 @@
-# Orbit Board — Liquid Glass preview
+# Orbit Board
 
-Preview restyle of Orbit Board: Apple Liquid Glass materials, zPayy blue (`#2f6bff`) with white labels, and zPayy fonts (Instrument Serif + DM Sans). Neumorphism is gone on this branch.
+A local-first Kanban with Apple Liquid Glass materials, zPayy blue (`#2f6bff`) with white labels, and zPayy fonts (Instrument Serif + DM Sans).
 
-**This branch does not replace the current live board.**
+## Live site
 
-| Version | URL |
-|---|---|
-| Current (unchanged) | https://dordunu1.github.io/cursor-mobile-kanban/ |
-| **Liquid Glass preview** | **https://dordunu1.github.io/cursor-mobile-kanban/liquid-glass/** |
+**https://dordunu1.github.io/cursor-mobile-kanban/**
 
-If the preview still looks ember/neumorphic, hard-refresh or open a private window — the old service worker may be caching the previous build.
+If the board still looks like the previous neumorphic theme, hard-refresh or open a private window — an old service worker may be caching the last build.
 
-## What changed visually
+## Look
+
 - Translucent glass panels (`backdrop-filter` blur + saturate, specular edge, Chromium refraction filter)
 - zPayy primary `#2f6bff` / `#3b75ff` → `#2a5ef0` with white text on primary buttons
 - Instrument Serif for titles, DM Sans for UI
 - Light-first wallpaper with blue / violet / green light so the glass has color to pick up
-- Dark mode is still there: navy glass, same blue CTAs
+- Dark mode: navy glass, same blue CTAs
 
 ## Features
 
-Same product as the usability branch: local-first Kanban, daily goals, archive, WIP, filters, PWA.
-
-## Features
-
-- Soft neumorphic light & dark themes
+- Light & dark themes
 - Renameable workspace
 - Workspace pulse overview with completion ring
 - Search + filters (priority, due today/soon/overdue, tags) with one-tap clear
@@ -40,6 +34,7 @@ Same product as the usability branch: local-first Kanban, daily goals, archive, 
 - Duplicate tasks
 - Undo toasts for delete, archive, import, reset, and moves
 - Column actions: sort by due/priority, collapse, archive completed
+- Custom glass dropdowns for filters, status, and priority
 - Drag from the grip — keyboard, mouse, and delayed touch
 - Keyboard shortcuts: `N` new task, `/` search
 - Persists in browser `localStorage`

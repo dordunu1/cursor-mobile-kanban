@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Preview-only deploy: https://dordunu1.github.io/cursor-mobile-kanban/liquid-glass/
+// GitHub Pages serves this project at /cursor-mobile-kanban/
 export default defineConfig({
-  base: '/cursor-mobile-kanban/liquid-glass/',
+  base: '/cursor-mobile-kanban/',
   plugins: [react()],
   server: {
     host: true,

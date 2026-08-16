@@ -1,8 +1,5 @@
-const CACHE = 'orbit-board-liquid-glass-v5'
-const SHELL = [
-  '/cursor-mobile-kanban/liquid-glass/',
-  '/cursor-mobile-kanban/liquid-glass/index.html',
-]
+const CACHE = 'orbit-board-v3'
+const SHELL = ['/cursor-mobile-kanban/', '/cursor-mobile-kanban/index.html']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -29,7 +26,7 @@ self.addEventListener('fetch', (event) => {
         return response
       })
       .catch(() =>
-        caches.match(event.request).then((cached) => cached || caches.match('/cursor-mobile-kanban/liquid-glass/')),
+        caches.match(event.request).then((cached) => cached || caches.match('/cursor-mobile-kanban/')),
       ),
   )
 })
